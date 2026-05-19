@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockTheSpot Premium Target Radar v8.0</title>
+    <title>LockTheSpot Premium Target Radar v8.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
@@ -25,9 +25,9 @@
         <div>
             <h1 class="text-xl md:text-2xl font-bold tracking-wider text-green-500 neon-text flex items-center gap-2">
                 <span>[🛰️] LOCKTHESPOT</span>
-                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v8.0</span>
+                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v8.1</span>
             </h1>
-            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Universal Analytics & Deep Time Target Scanner</p>
+            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Quandoo Adaptive & Deep Analytics Time Target Scanner</p>
         </div>
         <div id="radarBadge" class="hidden items-center gap-2 px-3 py-1 bg-green-950/30 border border-green-500/30 rounded text-xs text-green-400">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
@@ -76,7 +76,7 @@
                                 <option value="single">📅 Giorno Singolo Specifico</option>
                                 <option value="week">🗓️ Vista Settimanale (7 Giorni consecutivi)</option>
                                 <option value="month">📊 Vista Mensile (30 Giorni consecutivi)</option>
-                                <option value="year">🚀 Prospettiva Annuale (12 Mesi - Campionamento a Salti)</option>
+                                <option value="year">🚀 Prospettiva Annuale (12 Mesi - Campionamento Mensile)</option>
                             </select>
                         </div>
 
@@ -144,7 +144,7 @@
     </main>
 
     <footer class="border-t border-gray-900 bg-[#040814] px-6 py-3 text-center text-[10px] text-gray-600 tracking-widest uppercase">
-        LockTheSpot Core Engine v8.0 • Deep Metric Analytics Platform
+        LockTheSpot Core Engine v8.1 • Quandoo Adaptive Engine & Metric Analytics
     </footer>
 
     <script>
@@ -257,7 +257,7 @@
                 document.getElementById("vaultSection").classList.add("hidden");
                 document.getElementById("dashboardContainer").classList.remove("hidden", "opacity-0");
                 document.getElementById('targetDate').value = new Date().toISOString().split('T')[0];
-                logEntry("Engine sbloccato con successo. Terminale v8.0 pronto.", "success");
+                logEntry("Engine sbloccato con successo. Terminale v8.1 pronto.", "success");
             } catch (e) { logEntry("Errore durante lo sblocco: " + e.message, "error"); }
         }
 
@@ -298,8 +298,12 @@
                 if (!url) { alert("Incolla un URL API valido prima!"); return; }
                 if (!startDate) { alert("Definisci una data iniziale."); return; }
 
-                if(url.includes("date=") || url.includes("covers=") || url.includes("guest-count=")) {
-                    url = url.replace(/([\?&])date=[^&]*/g, '').replace(/([\?&])covers=[^&]*/g, '').replace(/([\?&])guest-count=[^&]*/g, '').replace(/([\?&])_nocache=[^&]*/g, '');
+                // Adattamento e pulizia dei filtri URL dinamici per evitare conflitti di duplicazione parametri
+                if(url.includes("date=") || url.includes("covers=") || url.includes("guest-count=") || url.includes("fromTime=")) {
+                    url = url.replace(/([\?&])date=[^&]*/g, '')
+                             .replace(/([\?&])covers=[^&]*/g, '')
+                             .replace(/([\?&])guest-count=[^&]*/g, '')
+                             .replace(/([\?&])_nocache=[^&]*/g, '');
                     url = url.replace(/&\s*$/, '').replace(/\?\s*$/, '');
                     document.getElementById("targetUrl").value = url;
                 }
@@ -341,13 +345,13 @@
             for (let i = 0; i < iterations; i++) {
                 let currentTargetDate;
                 if (mode === "year") {
-                    currentTargetDate = addMonths(startDate, i); // Controlla la stessa data nei 12 mesi dell'anno
+                    currentTargetDate = addMonths(startDate, i);
                 } else {
-                    currentTargetDate = addDays(startDate, i); // Sequenziale giorno dopo giorno
+                    currentTargetDate = addDays(startDate, i);
                 }
                 
                 await executeScan(url, currentTargetDate, covers, ntfy);
-                await new Promise(resolve => setTimeout(resolve, 250)); // Sleep preventivo anti-rate-limit
+                await new Promise(resolve => setTimeout(resolve, 300)); // Sleep anti-rate-limit
             }
             
             logEntry(`--- CICLO COMPLETATO CON SUCCESSO ---`, "success");
@@ -357,6 +361,8 @@
 
         async function executeScan(baseApiUrl, date, covers, ntfyChannel) {
             let finalUrl = baseApiUrl;
+            
+            // Gestione e formattazione parametrica specifica per endpoint (Quandoo accetta anche orari estesi nel parametro date)
             finalUrl += (finalUrl.includes("?") ? "&" : "?") + `date=${date}&covers=${covers}&guest-count=${covers}&_nocache=${new Date().getTime()}`;
 
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
@@ -369,15 +375,48 @@
             } catch (e) {}
         }
 
-        // ENGINE DI INTRECCIO E PARSING DATI BIGLIETTERIA/POSTI + ANALYTICS
+        // ENGINE DI INTRECCIO E PARSING ADATTIVO (PATCH QUANDOO + PLATFORM v8.1)
         function parseResponseData(data, date, ntfyChannel) {
             let found = false;
             let detectedSlots = [];
 
+            // Se la risposta principale dell'API è una lista di elementi diretti (Array standard di Quandoo)
+            if (Array.isArray(data)) {
+                if (data.length > 0) {
+                    found = true;
+                    data.forEach((item, idx) => {
+                        let name = item.name || (item.localization && item.localization.it && item.localization.it.name) || `Merchant #${idx + 1}`;
+                        detectedSlots.push(name);
+                    });
+                }
+            }
+
             function traverse(obj) {
                 if (!obj || typeof obj !== 'object') return;
 
-                // Estrazione dati vendita biglietti / Capienza (se esposti nell'API dell'evento)
+                // 1. Riconoscimento blocchi mercati/ristoranti Quandoo
+                if (obj.hasOwnProperty('merchants') && Array.isArray(obj.merchants)) {
+                    if (obj.merchants.length > 0) {
+                        found = true;
+                        obj.merchants.forEach(m => {
+                            let mName = m.name || `Merchant ID: ${m.id}`;
+                            detectedSlots.push(mName);
+                        });
+                    }
+                }
+
+                // 2. Intercettazione orari o datetime standard
+                if (obj.hasOwnProperty('time') || obj.hasOwnProperty('dateTime')) {
+                    let timeVal = obj.time || obj.dateTime;
+                    if (timeVal && (obj.available === true || obj.free === true || obj.status === 'AVAILABLE' || obj.selectable !== false)) {
+                        found = true;
+                        // Isola HH:MM se è una stringa timestamp ISO
+                        let cleanTime = String(timeVal).includes("T") ? String(timeVal).substring(11, 16) : String(timeVal).substring(0, 5);
+                        detectedSlots.push(cleanTime);
+                    }
+                }
+
+                // Estrazione analitica biglietti venduti / posti totali
                 let tSold = obj.sold_tickets || obj.tickets_sold || obj.purchased_count || obj.sold || null;
                 let tAvail = obj.available_tickets || obj.tickets_available || obj.remaining || obj.free_count || null;
                 let tTotal = obj.total_tickets || obj.capacity || obj.total_seats || null;
@@ -389,31 +428,25 @@
                     
                     if (avail > 0) {
                         found = true;
-                        detectedSlots.push(`Disponibili: ${avail} Tix`);
+                        detectedSlots.push(`Libere opzioni: ${avail}`);
                     }
                     
-                    // Archivia le metriche storiche aggregate per l'analizzatore grafico
                     let existingIndex = ticketStats.history.findIndex(h => h.date === date);
                     let statItem = { date: date, sold: sold, avail: avail, total: total };
                     if (existingIndex > -1) ticketStats.history[existingIndex] = statItem;
                     else ticketStats.history.push(statItem);
                 }
 
-                // Strutture classiche Ristoranti / Slot Orari
-                if (obj.hasOwnProperty('time') && (obj.available === true || obj.free === true || obj.status === 'available' || obj.status === 'free' || obj.selectable === true)) {
-                    found = true; if(obj.time) detectedSlots.push(obj.time);
-                }
-
-                // Parsing array di orari comuni
+                // Esplorazione array di ramificazione interni
                 for (let key in obj) {
                     if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
-                        if (['slots', 'times', 'timeSlots', 'availableSlots', 'listings'].includes(key)) {
+                        if (['slots', 'times', 'timeSlots', 'availableSlots', 'merchants', 'applicableDays'].includes(key)) {
                             if (Array.isArray(obj[key])) {
                                 obj[key].forEach(item => {
                                     found = true;
                                     if (typeof item === 'string') detectedSlots.push(item);
                                     else if (item && typeof item === 'object') {
-                                        let details = item.time || item.hour || (item.available_tickets ? `${item.available_tickets} tix` : null);
+                                        let details = item.time || item.hour || item.name || (item.dateTime ? String(item.dateTime).substring(11,16) : null);
                                         if (details) detectedSlots.push(details);
                                     }
                                 });
@@ -428,10 +461,10 @@
 
             if (found) {
                 let cleanSlots = [...new Set(detectedSlots)].sort();
-                if (cleanSlots.length === 0) cleanSlots = ["Disponibile"];
+                if (cleanSlots.length === 0) cleanSlots = ["Disponibile (Vedi Hub)"];
                 
                 if (!globalActiveSlots[date]) {
-                    logEntry(`TARGET INTERCETTATO -> Data: [${date}] Orari/Ticket: [${cleanSlots.join(" | ")}]`, "success");
+                    logEntry(`TARGET IDENTIFICATO -> Data: [${date}] Riscontri: [${cleanSlots.join(" | ")}]`, "success");
                     playBeep();
                     if (ntfyChannel) sendNtfyNotification(ntfyChannel, date, cleanSlots);
                 }
@@ -488,7 +521,6 @@
             ticketStats.history.sort((a,b) => a.date.localeCompare(b.date)).forEach(stat => {
                 let percentSold = stat.total > 0 ? Math.round((stat.sold / stat.total) * 100) : 0;
                 
-                // Genera una barra di caricamento testuale (Es: [██████░░░░] 60%)
                 let barLength = 15;
                 let filledLength = Math.round((percentSold / 100) * barLength);
                 let barStr = "█".repeat(filledLength) + "░".repeat(barLength - filledLength);
@@ -513,7 +545,7 @@
             try {
                 await fetch(`https://ntfy.sh/${channel}`, { 
                     method: 'POST', 
-                    body: `🛰️ Radar Rilevamento: Posto trovato per il ${date}! Dettagli: ${slots.join(" | ")}` 
+                    body: `🛰️ Radar LTS: Trovata disponibilità per il giorno ${date}! Dettagli: ${slots.join(" | ")}` 
                 });
             } catch (err) {}
         }
