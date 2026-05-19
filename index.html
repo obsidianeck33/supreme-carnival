@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Radar Elite Scanner v6.2</title>
+    <title>LockTheSpot - Premium Radar v7.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxDxNmOn1+4FR6G4U6lOWcTyFuL1FjWnxa0lCDvaVVfOCCMkv9dfv8aG65M7Y7gM69iBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
         :root {
             --bg-marble: #f8f9fa; --surface: rgba(255, 255, 255, 0.9); --surface-card: #ffffff;
@@ -32,8 +35,8 @@
         }
 
         .brand-container { display: flex; flex-direction: column; }
-        .brand-logo { font-family: 'Cinzel', serif; font-weight: 800; font-size: 19px; letter-spacing: 0.1em; color: var(--gold-dark); text-transform: uppercase; }
-        .brand-sub { font-size: 9px; font-weight: 700; letter-spacing: 0.3em; color: var(--text-muted); text-transform: uppercase; margin-top: -2px; }
+        .brand-logo { font-family: 'Cinzel', serif; font-weight: 800; font-size: 20px; letter-spacing: 0.08em; color: var(--gold-dark); text-transform: uppercase; }
+        .brand-sub { font-size: 9px; font-weight: 700; letter-spacing: 0.35em; color: var(--text-muted); text-transform: uppercase; margin-top: -2px; }
         
         .btn { 
             background: #ffffff; color: var(--gold-dark); border: 1.5px solid var(--gold); padding: 12px 28px; 
@@ -100,8 +103,8 @@
 
     <header>
         <div class="brand-container">
-            <span class="brand-logo">Atelier Elite</span>
-            <span class="brand-sub">Premium Target Scanner v6.2</span>
+            <span class="brand-logo">LockTheSpot</span>
+            <span class="brand-sub">Premium Target Radar v7.0</span>
         </div>
         <div id="statusBadge" class="scan-indicator" style="display:none;">
             <div class="dot"></div> <span id="scanningDate">Analisi...</span>
@@ -110,12 +113,20 @@
     </header>
 
     <main>
+        <div class="card" style="border: 1px solid rgba(197, 160, 89, 0.4); background: rgba(255, 255, 255, 0.95);">
+            <div class="card-header"><span class="card-title">🛡️ Sicurezza Vault AES</span><div class="card-line"></div></div>
+            <div class="input-field">
+                <label>Chiave di Cifratura Privata (Password segreta per sbloccare i tuoi dati)</label>
+                <input type="password" id="vaultKey" placeholder="Immetti la tua password per sbloccare o salvare..." oninput="handleKeyChange()">
+            </div>
+        </div>
+
         <div class="card">
-            <div class="card-header"><span class="card-title">Parametri Elite</span><div class="card-line"></div></div>
+            <div class="card-header"><span class="card-title">Parametri di Scansione</span><div class="card-line"></div></div>
             <div class="input-group">
                 <div class="input-field">
-                    <label>Endpoint API Sorgente (Catturato con F12)</label>
-                    <input type="text" id="baseUrl" placeholder="Incolla qui il nuovo link del ristorante...">
+                    <label>Endpoint API Ristorante (Catturato con F12)</label>
+                    <input type="text" id="baseUrl" placeholder="Incolla qui il link dell'API del locale...">
                 </div>
                 
                 <div class="grid-3">
@@ -134,23 +145,23 @@
                 </div>
 
                 <div class="input-field">
-                    <label>Canale Notifiche Push (ntfy.sh - Opzionale)</label>
+                    <label>Canale Notifiche Push (ntfy.sh)</label>
                     <input type="text" id="ntfy" placeholder="Es: salotto_tavoli_radar">
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><span class="card-title">Matrix Disponibilità</span><div class="card-line"></div></div>
+            <div class="card-header"><span class="card-title">Matrix Disponibilità Live</span><div class="card-line"></div></div>
             <div id="liveMatrix" class="matrix-display">
                 <div style="text-align:center; color:var(--text-muted); font-style:italic; padding:40px; font-size:13px;">
-                    Seleziona una data, inserisci l'URL e avvia il radar...
+                    Imposta la password del Vault, inserisci l'URL e avvia il motore...
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><span class="card-title">Log Di Sistema</span><div class="card-line"></div></div>
+            <div class="card-header"><span class="card-title">Registro Log di Sistema</span><div class="card-line"></div></div>
             <div id="activityLog" class="activity-log"></div>
         </div>
     </main>
@@ -163,19 +174,44 @@
         window.onload = () => {
             const oggi = new Date().toISOString().split('T')[0];
             document.getElementById('targetCalendar').value = oggi;
-            
-            // Carica solo le notifiche, lasciando l'URL volutamente vuoto
-            if(localStorage.getItem('e_ntfy')) document.getElementById('ntfy').value = localStorage.getItem('e_ntfy');
+            pushLog("Vault Inizializzato. Digita la tua chiave segreta per sbloccare i link.");
         };
+
+        // Decrittografa al volo i dati salvati non appena la password inserita è corretta
+        function handleKeyChange() {
+            const key = document.getElementById("vaultKey").value;
+            if(!key) return;
+
+            try {
+                const encryptedUrl = localStorage.getItem('enc_url');
+                const encryptedNtfy = localStorage.getItem('enc_ntfy');
+
+                if (encryptedUrl) {
+                    const decUrl = CryptoJS.AES.decrypt(encryptedUrl, key).toString(CryptoJS.enc.Utf8);
+                    if(decUrl.startsWith("http")) document.getElementById('baseUrl').value = decUrl;
+                }
+                if (encryptedNtfy) {
+                    const decNtfy = CryptoJS.AES.decrypt(encryptedNtfy, key).toString(CryptoJS.enc.Utf8);
+                    if(decNtfy) document.getElementById('ntfy').value = decNtfy;
+                }
+            } catch (e) {
+                // Silenzioso se la password non è ancora completa o corretta
+            }
+        }
 
         function toggleEliteSystem() {
             const btn = document.getElementById("actionBtn");
             const badge = document.getElementById("statusBadge");
             const url = document.getElementById("baseUrl").value.trim();
             const selectedDate = document.getElementById("targetCalendar").value;
+            const key = document.getElementById("vaultKey").value;
 
+            if(!key) {
+                alert("Protezione Obligatoria: Inserisci una password nel Vault AES per difendere i tuoi dati.");
+                return;
+            }
             if(!url || !selectedDate) {
-                alert("Configurazione incompleta: Inserisci l'URL dell'API e seleziona un giorno sul calendario.");
+                alert("Parametri mancanti: Assicurati di inserire l'URL e scegliere un giorno sul calendario.");
                 return;
             }
 
@@ -185,18 +221,23 @@
                 btn.textContent = "Inizia Scansione";
                 btn.className = "btn btn-main";
                 badge.style.display = "none";
-                pushLog("Sessione di monitoraggio terminata.");
+                pushLog("Monitoraggio LockTheSpot arrestato.");
             } else {
                 isRunning = true;
                 notifiedSlots.clear();
                 
-                localStorage.setItem('e_ntfy', document.getElementById("ntfy").value);
+                // Cifratura simmetrica dei parametri sensibili prima del salvataggio nel browser
+                const encUrl = CryptoJS.AES.encrypt(url, key).toString();
+                const encNtfy = CryptoJS.AES.encrypt(document.getElementById("ntfy").value.trim(), key).toString();
+                
+                localStorage.setItem('enc_url', encUrl);
+                localStorage.setItem('enc_ntfy', encNtfy);
 
                 btn.textContent = "Spegni Radar";
                 btn.className = "btn btn-main running";
                 badge.style.display = "inline-flex";
                 
-                pushLog(`Engine Avviato. Target impostato sul giorno: ${selectedDate}`);
+                pushLog(`[Crypto Lock] Configurazione cifrata nel database locale. Analisi avviata sul giorno: ${selectedDate}`);
                 runScannerCycle();
                 rotationTimer = setInterval(runScannerCycle, parseInt(document.getElementById("freq").value) * 1000);
             }
@@ -214,12 +255,19 @@
             proxyUrl = proxyUrl.replace(/date=\d{4}-\d{2}-\d{2}/, `date=${targetDate}`);
             proxyUrl = proxyUrl.replace(/covers=\d+/, `covers=${covers}`);
 
-            const allOriginsUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(proxyUrl)}&_=${new Date().getTime()}`;
+            if(proxyUrl.includes('?')) {
+                proxyUrl += `&_nocache=${new Date().getTime()}`;
+            } else {
+                proxyUrl += `?_nocache=${new Date().getTime()}`;
+            }
+
+            // Routing ultra-veloce tramite la rete globale Cloudflare di corsproxy.io
+            const cloudflarePoweredUrl = `https://corsproxy.io/?${encodeURIComponent(proxyUrl)}`;
 
             try {
-                const response = await fetch(allOriginsUrl);
-                const data = await response.json();
-                const json = JSON.parse(data.contents);
+                const response = await fetch(cloudflarePoweredUrl);
+                if (!response.ok) throw new Error();
+                const json = await response.json();
                 
                 let foundSlots = [];
                 
@@ -235,7 +283,7 @@
                 renderLiveView(targetDate, foundSlots);
 
                 if(foundSlots.length > 0) {
-                    pushLog(`Rilevati ${foundSlots.length} tavoli disponibili per il giorno ${targetDate}!`, "success");
+                    pushLog(`[Cloudflare Node] Rilevati ${foundSlots.length} slot liberi per il giorno ${targetDate}!`, "success");
                     foundSlots.forEach(time => {
                         let id = `${targetDate}_${time}`;
                         if(ntfy && !notifiedSlots.has(id)) {
@@ -244,11 +292,11 @@
                         }
                     });
                 } else {
-                    pushLog(`Verifica eseguita per il ${targetDate}: Risorsa Esaurita.`);
+                    pushLog(`[Cloudflare Node] Analisi eseguita per il ${targetDate}: Sold Out.`);
                 }
 
             } catch (e) {
-                pushLog("Problema di rete o formato dati non compatibile. Attendo il prossimo ciclo.", "error");
+                pushLog("Nessuna risposta dal server di sblocco Cloudflare. Ripeto al prossimo intervallo.", "error");
             }
         }
 
@@ -261,7 +309,7 @@
             
             const label = document.createElement("div");
             label.className = "date-label";
-            label.innerHTML = `<span>📅 Risultati per il: ${date}</span> <span>${slots.length > 0 ? slots.length + ' slot liberi' : 'Sold Out'}</span>`;
+            label.innerHTML = `<span>📅 Esito per il: ${date}</span> <span>${slots.length > 0 ? slots.length + ' disponibili' : 'Sold Out'}</span>`;
             row.appendChild(label);
 
             const container = document.createElement("div");
@@ -275,7 +323,7 @@
                     container.appendChild(pill);
                 });
             } else {
-                container.innerHTML = `<div style="font-size:11px; color:var(--red); font-weight:600; text-transform:uppercase; padding:10px 5px;">❌ Tutto esaurito su questa data</div>`;
+                container.innerHTML = `<div style="font-size:11px; color:var(--red); font-weight:600; text-transform:uppercase; padding:10px 5px;">❌ Nessun tavolo disponibile in questa data</div>`;
             }
             
             row.appendChild(container);
