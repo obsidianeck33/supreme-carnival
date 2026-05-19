@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Radar Target Premium v5</title>
+    <title>Radar Target Premium v5.1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -26,7 +26,6 @@
         
         body { 
             background: var(--bg-marble);
-            /* Texture effetto marmo soft */
             background-image: 
                 linear-gradient(120deg, rgba(255,255,255,0.6) 0%, rgba(240,242,245,0.7) 100%),
                 radial-gradient(at 20% 20%, rgba(226,232,240,0.4) 0px, transparent 50%),
@@ -75,12 +74,10 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
             cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 0 2px 10px rgba(188, 156, 106, 0.05);
+            transition: all 0.3s ease; 
         }
-        .btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+        .btn:hover { background: var(--gold-light); }
         .btn-main { background: var(--text-dark); color: #ffffff; border: 1px solid var(--text-dark); }
-        .btn-main:hover { background: #0f172a; }
         .btn-main.running { background: var(--red); color: #ffffff; border-color: var(--red); box-shadow: 0 4px 15px rgba(190, 18, 60, 0.2); }
         
         main { max-width: 800px; margin: 0 auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
@@ -122,11 +119,7 @@
             border-radius: 14px; 
             color: var(--text-dark); 
             font-size: 14px; 
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.01);
         }
-        .input-wrapper input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); }
         
         .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
         
@@ -141,14 +134,11 @@
             gap: 4px; 
             font-weight: 600; 
             text-align: center; 
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
         }
         .time-pad.available { 
             background: var(--green-bg); 
             border-color: var(--green); 
             color: var(--green); 
-            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.05);
             animation: pulseGlow 2s infinite ease-in-out;
         }
 
@@ -176,21 +166,14 @@
         .activity-row.error { color: var(--red); }
         
         .toggle-container { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
-        .toggle-container input[type="checkbox"] {
-            accent-color: var(--gold);
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-
-        #liveTag { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; transition: all 0.3s ease; }
+        #liveTag { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
     </style>
 </head>
 <body>
 
     <header>
         <div style="display:flex; align-items:center; gap:12px;">
-            <span class="brand-title">Atelier Radar v5</span>
+            <span class="brand-title">Atelier Radar v5.1</span>
             <span id="liveTag" style="background:var(--border); color:var(--text-muted);">Standby</span>
         </div>
         <button class="btn btn-main" id="actionBtn" onclick="toggleSystem()">Avvia Radar</button>
@@ -217,8 +200,8 @@
                 </div>
 
                 <div class="toggle-container">
-                    <input type="checkbox" id="useGoogleBypass" checked>
-                    <label for="useGoogleBypass">Attiva Instradamento Invisibile Anti-Blocco (Consigliato)</label>
+                    <input type="checkbox" id="useAllOrigins" checked>
+                    <label for="useAllOrigins">Attiva Flusso Ultra-Bypass (Fisso contro i blocchi di rete)</label>
                 </div>
             </div>
         </div>
@@ -293,28 +276,28 @@
         async function executeUniversalCheck() {
             let targetUrl = document.getElementById("apiTargetUrl").value.trim();
             const ntfy = document.getElementById("ntfyChannel").value.trim();
-            const useGoogle = document.getElementById("useGoogleBypass").checked;
+            const useBypass = document.getElementById("useAllOrigins").checked;
             const grid = document.getElementById("matrixGrid");
             const timeField = document.getElementById("lastCheckTime");
 
             timeField.textContent = `Update: ${new Date().toLocaleTimeString("it-IT")}`;
 
             let finalUrl = targetUrl;
-            if(useGoogle) {
-                finalUrl = "https://images" + ~~(Math.random() * 3 + 1) + "-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=5&url=" + encodeURIComponent(targetUrl);
+            if(useBypass) {
+                finalUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&_=` + new Date().getTime();
             }
 
             try {
                 let response = await fetch(finalUrl);
-                let textData = await response.text();
+                if (!response.ok) throw new Error();
                 
+                let rawData = await response.json();
                 let cleanJson;
-                try {
-                    cleanJson = JSON.parse(textData);
-                } catch(e) {
-                    let match = textData.match(/\{[\s\S]*\}/);
-                    if(match) cleanJson = JSON.parse(match[0]);
-                    else throw new Error();
+                
+                if (useBypass && rawData.contents) {
+                    cleanJson = JSON.parse(rawData.contents);
+                } else {
+                    cleanJson = rawData;
                 }
                 
                 grid.innerHTML = "";
@@ -356,12 +339,12 @@
                     });
                     pushLog(`Scansione eseguita. Rilevati ${slotsFound.length} slot liberi.`, "success");
                 } else {
-                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:30px; font-weight:500; font-size:13px; letter-spacing:0.02em;">Nessun tavolo disponibile per i parametri indicati.</div>`;
+                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:30px; font-weight:500; font-size:13px; letter-spacing:0.02em;">Nessun tavolo disponibile per la data selezionata.</div>`;
                     pushLog(`Controllo completato. Stato: Esaurito.`);
                 }
 
             } catch (error) {
-                pushLog("Connessione instabile o endpoint non raggiungibile. Nuovo tentativo...", "error");
+                pushLog("Connessione instabile o bypass temporaneamente occupato. Riprovo...", "error");
             }
         }
 
