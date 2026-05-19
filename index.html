@@ -3,362 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Radar Target Premium v5.1</title>
+    <title>Radar Elite Scanner v6.2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-marble: #f4f5f7;
-            --surface: rgba(255, 255, 255, 0.85);
-            --surface-card: #ffffff;
-            --border: #e2e8f0;
-            --gold: #bc9c6a;
-            --gold-light: rgba(188, 156, 106, 0.1);
-            --gold-dark: #8c6d3f;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --green: #0f766e;
-            --green-bg: rgba(15, 118, 110, 0.08);
-            --red: #be123c;
+            --bg-marble: #f8f9fa; --surface: rgba(255, 255, 255, 0.9); --surface-card: #ffffff;
+            --border: #e9ecef; --gold: #c5a059; --gold-dark: #92733f; --gold-light: rgba(197, 160, 89, 0.15);
+            --text-main: #212529; --text-muted: #6c757d; --green: #15803d; --red: #b91c1c;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-font-smoothing: antialiased; }
         
         body { 
             background: var(--bg-marble);
             background-image: 
-                linear-gradient(120deg, rgba(255,255,255,0.6) 0%, rgba(240,242,245,0.7) 100%),
-                radial-gradient(at 20% 20%, rgba(226,232,240,0.4) 0px, transparent 50%),
-                radial-gradient(at 80% 40%, rgba(203,213,225,0.3) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(197, 160, 89, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(197, 160, 89, 0.05) 0px, transparent 50%),
+                linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             background-attachment: fixed;
-            color: var(--text-dark); 
-            padding-bottom: 40px; 
-            font-size: 14px; 
+            color: var(--text-main); padding-bottom: 50px; 
         }
         
         header { 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(188, 156, 106, 0.2); 
-            padding: 0 24px; 
-            height: 80px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(197, 160, 89, 0.25); padding: 0 24px; height: 85px; 
+            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
         }
 
-        .brand-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 0.08em;
-            color: var(--text-dark);
-            background: linear-gradient(135deg, #1e293b 0%, #bc9c6a 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .brand-container { display: flex; flex-direction: column; }
+        .brand-logo { font-family: 'Cinzel', serif; font-weight: 800; font-size: 19px; letter-spacing: 0.1em; color: var(--gold-dark); text-transform: uppercase; }
+        .brand-sub { font-size: 9px; font-weight: 700; letter-spacing: 0.3em; color: var(--text-muted); text-transform: uppercase; margin-top: -2px; }
         
         .btn { 
-            background: var(--surface-card); 
-            color: var(--gold-dark); 
-            border: 1px solid var(--gold); 
-            padding: 12px 24px; 
-            border-radius: 30px; 
-            font-size: 12px; 
-            font-weight: 600; 
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            cursor: pointer; 
-            transition: all 0.3s ease; 
+            background: #ffffff; color: var(--gold-dark); border: 1.5px solid var(--gold); padding: 12px 28px; 
+            border-radius: 40px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
         }
-        .btn:hover { background: var(--gold-light); }
-        .btn-main { background: var(--text-dark); color: #ffffff; border: 1px solid var(--text-dark); }
-        .btn-main.running { background: var(--red); color: #ffffff; border-color: var(--red); box-shadow: 0 4px 15px rgba(190, 18, 60, 0.2); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--gold-light); }
+        .btn-main { background: var(--gold-dark); color: #ffffff; border: none; }
+        .btn-main.running { background: var(--red); box-shadow: 0 5px 20px rgba(185, 28, 28, 0.25); }
         
-        main { max-width: 800px; margin: 0 auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
+        main { max-width: 900px; margin: 0 auto; padding: 25px 18px; display: flex; flex-direction: column; gap: 25px; }
         
         .card { 
-            background: var(--surface); 
-            border: 1px solid rgba(255, 255, 255, 0.7); 
-            border-radius: 24px; 
-            padding: 28px; 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: var(--surface); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 28px; padding: 30px; 
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         }
         
-        .card-title { 
-            font-family: 'Cinzel', serif;
-            font-size: 12px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            letter-spacing: 0.1em; 
-            color: var(--gold-dark); 
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .card-title::after { content: ''; flex-grow: 1; height: 1px; background: linear-gradient(to right, rgba(188,156,106,0.2), transparent); }
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; }
+        .card-title { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--gold-dark); letter-spacing: 0.1em; text-transform: uppercase; }
+        .card-line { flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--gold-light), transparent); }
         
-        .form-grid { display: flex; flex-direction: column; gap: 20px; }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 600px) { .input-row { grid-template-columns: 1fr; } }
-        
-        .input-wrapper label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
-        .input-wrapper input { 
-            width: 100%; 
-            padding: 14px 18px; 
-            background: rgba(255,255,255,0.9); 
-            border: 1px solid var(--border); 
-            border-radius: 14px; 
-            color: var(--text-dark); 
-            font-size: 14px; 
+        .input-group { display: flex; flex-direction: column; gap: 20px; }
+        .input-field { display: flex; flex-direction: column; gap: 8px; }
+        .input-field label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; padding-left: 5px; }
+        .input-field input { 
+            background: rgba(255,255,255,0.8); border: 1px solid var(--border); border-radius: 18px; padding: 15px 20px;
+            font-size: 13px; font-weight: 500; color: var(--text-main); transition: all 0.3s ease; 
         }
+        .input-field input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px var(--gold-light); }
         
-        .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
-        
-        .time-pad { 
-            background: #ffffff; 
-            border: 1px solid var(--border); 
-            border-radius: 16px; 
-            padding: 16px 10px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 4px; 
-            font-weight: 600; 
-            text-align: center; 
-        }
-        .time-pad.available { 
-            background: var(--green-bg); 
-            border-color: var(--green); 
-            color: var(--green); 
-            animation: pulseGlow 2s infinite ease-in-out;
-        }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        @media (max-width: 650px) { .grid-3 { grid-template-columns: 1fr; } }
 
-        @keyframes pulseGlow {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
+        .matrix-display { display: flex; flex-direction: column; gap: 15px; }
+        .date-row { background: rgba(255,255,255,0.5); border-radius: 20px; padding: 15px; border: 1px dashed var(--border); }
+        .date-label { font-size: 11px; font-weight: 700; color: var(--gold-dark); margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .slots-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
         
-        .activity-container { 
-            background: rgba(255, 255, 255, 0.5); 
-            border: 1px solid var(--border); 
-            border-radius: 16px; 
-            height: 160px; 
-            overflow-y: auto; 
-            padding: 16px; 
-            font-size: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
+        .slot-pill { 
+            background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 12px 5px;
+            display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.3s ease;
         }
-        .activity-row { display: flex; gap: 10px; font-weight: 500; line-height: 1.4; color: var(--text-dark); }
-        .activity-time { color: var(--text-muted); font-weight: 400; flex-shrink: 0; }
-        .activity-row.success { color: var(--green); }
-        .activity-row.error { color: var(--red); }
-        
-        .toggle-container { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
-        #liveTag { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
+        .slot-pill.active { 
+            background: rgba(21, 128, 61, 0.06); border-color: var(--green); color: var(--green); 
+            box-shadow: 0 5px 15px rgba(21, 128, 61, 0.1); animation: slotPop 0.5s ease-out;
+        }
+        @keyframes slotPop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
+
+        .activity-log { 
+            background: rgba(255,255,255,0.4); border-radius: 20px; height: 180px; overflow-y: auto; 
+            padding: 20px; border: 1px solid var(--border); font-size: 11px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .log-entry { display: flex; gap: 10px; line-height: 1.4; border-bottom: 1px solid rgba(0,0,0,0.02); padding-bottom: 4px; }
+        .log-time { color: var(--text-muted); font-family: monospace; font-weight: 600; }
+        .log-msg.success { color: var(--green); font-weight: 600; }
+        .log-msg.error { color: var(--red); }
+
+        .scan-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; color: var(--gold-dark); background: var(--gold-light); padding: 5px 12px; border-radius: 20px; }
+        .dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display:flex; align-items:center; gap:12px;">
-            <span class="brand-title">Atelier Radar v5.1</span>
-            <span id="liveTag" style="background:var(--border); color:var(--text-muted);">Standby</span>
+        <div class="brand-container">
+            <span class="brand-logo">Atelier Elite</span>
+            <span class="brand-sub">Premium Target Scanner v6.2</span>
         </div>
-        <button class="btn btn-main" id="actionBtn" onclick="toggleSystem()">Avvia Radar</button>
+        <div id="statusBadge" class="scan-indicator" style="display:none;">
+            <div class="dot"></div> <span id="scanningDate">Analisi...</span>
+        </div>
+        <button class="btn btn-main" id="actionBtn" onclick="toggleEliteSystem()">Inizia Scansione</button>
     </header>
 
     <main>
         <div class="card">
-            <div class="card-title">Configurazione Sorgente</div>
-            <div class="form-grid">
-                <div class="input-wrapper">
-                    <label>Link Endpoint Concierge (API URL)</label>
-                    <input type="text" id="apiTargetUrl" placeholder="Incolla l'indirizzo catturato con F12">
+            <div class="card-header"><span class="card-title">Parametri Elite</span><div class="card-line"></div></div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label>Endpoint API Sorgente (Catturato con F12)</label>
+                    <input type="text" id="baseUrl" placeholder="Incolla qui il nuovo link del ristorante...">
                 </div>
                 
-                <div class="input-row">
-                    <div class="input-wrapper">
-                        <label>Intervallo (Secondi)</label>
-                        <input type="number" id="loopSeconds" value="10" min="5">
+                <div class="grid-3">
+                    <div class="input-field">
+                        <label>Seleziona Giorno da Monitorare</label>
+                        <input type="date" id="targetCalendar">
                     </div>
-                    <div class="input-wrapper">
-                        <label>Canale Notifiche Privato (ntfy.sh)</label>
-                        <input type="text" id="ntfyChannel" placeholder="Es: salotto_tavoli_premium">
+                    <div class="input-field">
+                        <label>Covers (Persone)</label>
+                        <input type="number" id="covers" value="2">
+                    </div>
+                    <div class="input-field">
+                        <label>Frequenza Check (Sec)</label>
+                        <input type="number" id="freq" value="10" min="5">
                     </div>
                 </div>
 
-                <div class="toggle-container">
-                    <input type="checkbox" id="useAllOrigins" checked>
-                    <label for="useAllOrigins">Attiva Flusso Ultra-Bypass (Fisso contro i blocchi di rete)</label>
+                <div class="input-field">
+                    <label>Canale Notifiche Push (ntfy.sh - Opzionale)</label>
+                    <input type="text" id="ntfy" placeholder="Es: salotto_tavoli_radar">
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">Disponibilità in Tempo Reale</div>
-            <div class="matrix-grid" id="matrixGrid">
-                <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:30px; font-weight:400; font-style: italic;">
-                    In attesa di inizializzazione della sorgente...
+            <div class="card-header"><span class="card-title">Matrix Disponibilità</span><div class="card-line"></div></div>
+            <div id="liveMatrix" class="matrix-display">
+                <div style="text-align:center; color:var(--text-muted); font-style:italic; padding:40px; font-size:13px;">
+                    Seleziona una data, inserisci l'URL e avvia il radar...
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div class="card-title" style="margin-bottom:0;">Registro di Rete</div>
-                <div id="lastCheckTime" style="font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted);">Update: mai</div>
-            </div>
-            <div class="activity-container" id="activityBox"></div>
+            <div class="card-header"><span class="card-title">Log Di Sistema</span><div class="card-line"></div></div>
+            <div id="activityLog" class="activity-log"></div>
         </div>
     </main>
 
     <script>
         let isRunning = false;
-        let engineInterval = null;
-        let historyNotified = new Set();
+        let rotationTimer = null;
+        let notifiedSlots = new Set();
 
-        if(localStorage.getItem('saved_api_url')) {
-            document.getElementById('apiTargetUrl').value = localStorage.getItem('saved_api_url');
-            document.getElementById('ntfyChannel').value = localStorage.getItem('saved_ntfy_channel');
-            document.getElementById('loopSeconds').value = localStorage.getItem('saved_loop_seconds') || 10;
-        }
+        window.onload = () => {
+            const oggi = new Date().toISOString().split('T')[0];
+            document.getElementById('targetCalendar').value = oggi;
+            
+            // Carica solo le notifiche, lasciando l'URL volutamente vuoto
+            if(localStorage.getItem('e_ntfy')) document.getElementById('ntfy').value = localStorage.getItem('e_ntfy');
+        };
 
-        function toggleSystem() {
+        function toggleEliteSystem() {
             const btn = document.getElementById("actionBtn");
-            const tag = document.getElementById("liveTag");
-            const targetUrl = document.getElementById("apiTargetUrl").value.trim();
-            const secondi = parseInt(document.getElementById("loopSeconds").value) || 10;
+            const badge = document.getElementById("statusBadge");
+            const url = document.getElementById("baseUrl").value.trim();
+            const selectedDate = document.getElementById("targetCalendar").value;
 
-            if(!targetUrl && !isRunning) {
-                alert("Per favore, inserisci un endpoint valido.");
+            if(!url || !selectedDate) {
+                alert("Configurazione incompleta: Inserisci l'URL dell'API e seleziona un giorno sul calendario.");
                 return;
             }
 
             if(isRunning) {
                 isRunning = false;
-                clearInterval(engineInterval);
-                btn.textContent = "Avvia Radar";
+                clearInterval(rotationTimer);
+                btn.textContent = "Inizia Scansione";
                 btn.className = "btn btn-main";
-                tag.textContent = "Standby";
-                tag.style.background = "var(--border)"; tag.style.color = "var(--text-muted)";
-                pushLog("Monitoraggio interrotto.");
+                badge.style.display = "none";
+                pushLog("Sessione di monitoraggio terminata.");
             } else {
                 isRunning = true;
-                historyNotified.clear();
+                notifiedSlots.clear();
                 
-                localStorage.setItem('saved_api_url', targetUrl);
-                localStorage.setItem('saved_ntfy_channel', document.getElementById("ntfyChannel").value.trim());
-                localStorage.setItem('saved_loop_seconds', secondi);
+                localStorage.setItem('e_ntfy', document.getElementById("ntfy").value);
 
-                btn.textContent = "Ferma Radar";
+                btn.textContent = "Spegni Radar";
                 btn.className = "btn btn-main running";
-                tag.textContent = "Live Active";
-                tag.style.background = "var(--gold-light)"; tag.style.color = "var(--gold-dark)";
+                badge.style.display = "inline-flex";
                 
-                pushLog("Inizializzazione sessione di monitoraggio...");
-                executeUniversalCheck();
-                engineInterval = setInterval(executeUniversalCheck, secondi * 1000);
+                pushLog(`Engine Avviato. Target impostato sul giorno: ${selectedDate}`);
+                runScannerCycle();
+                rotationTimer = setInterval(runScannerCycle, parseInt(document.getElementById("freq").value) * 1000);
             }
         }
 
-        async function executeUniversalCheck() {
-            let targetUrl = document.getElementById("apiTargetUrl").value.trim();
-            const ntfy = document.getElementById("ntfyChannel").value.trim();
-            const useBypass = document.getElementById("useAllOrigins").checked;
-            const grid = document.getElementById("matrixGrid");
-            const timeField = document.getElementById("lastCheckTime");
+        async function runScannerCycle() {
+            const base = document.getElementById("baseUrl").value.trim();
+            const targetDate = document.getElementById("targetCalendar").value;
+            const ntfy = document.getElementById("ntfy").value.trim();
+            const covers = document.getElementById("covers").value;
+            
+            document.getElementById("scanningDate").textContent = `Analisi: ${targetDate}`;
 
-            timeField.textContent = `Update: ${new Date().toLocaleTimeString("it-IT")}`;
+            let proxyUrl = base;
+            proxyUrl = proxyUrl.replace(/date=\d{4}-\d{2}-\d{2}/, `date=${targetDate}`);
+            proxyUrl = proxyUrl.replace(/covers=\d+/, `covers=${covers}`);
 
-            let finalUrl = targetUrl;
-            if(useBypass) {
-                finalUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&_=` + new Date().getTime();
-            }
+            const allOriginsUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(proxyUrl)}&_=${new Date().getTime()}`;
 
             try {
-                let response = await fetch(finalUrl);
-                if (!response.ok) throw new Error();
+                const response = await fetch(allOriginsUrl);
+                const data = await response.json();
+                const json = JSON.parse(data.contents);
                 
-                let rawData = await response.json();
-                let cleanJson;
+                let foundSlots = [];
                 
-                if (useBypass && rawData.contents) {
-                    cleanJson = JSON.parse(rawData.contents);
-                } else {
-                    cleanJson = rawData;
-                }
-                
-                grid.innerHTML = "";
-                let slotsFound = [];
-
-                function searchJsonDeep(obj) {
+                function extractSlots(obj) {
                     if (!obj || typeof obj !== 'object') return;
-
                     if (obj.time && (obj.available === true || obj.free === true || obj.status === 'available')) {
-                        slotsFound.push({ time: obj.time, label: 'DISPONIBILE' });
-                        return;
+                        foundSlots.push(obj.time);
                     }
-
-                    for (let key in obj) {
-                        if (typeof obj[key] === 'string' && (obj[key].toLowerCase() === 'available' || obj[key].toLowerCase() === 'free')) {
-                            if(key.includes(":") || !isNaN(key)) {
-                                slotsFound.push({ time: key, label: 'DISPONIBILE' });
-                            }
-                        } else if (typeof obj[key] === 'object') {
-                            searchJsonDeep(obj[key]);
-                        }
-                    }
+                    for (let k in obj) if (typeof obj[k] === 'object') extractSlots(obj[k]);
                 }
+                extractSlots(json);
 
-                searchJsonDeep(cleanJson);
+                renderLiveView(targetDate, foundSlots);
 
-                if(slotsFound.length > 0) {
-                    slotsFound.sort((a,b) => a.time.localeCompare(b.time));
-                    slotsFound.forEach(slot => {
-                        const pad = document.createElement("div");
-                        pad.className = "time-pad available";
-                        pad.innerHTML = `<span style="font-size:15px; letter-spacing:0.02em;">${slot.time}</span><span style="font-size:9px; font-weight:700; letter-spacing:0.05em;">${slot.label}</span>`;
-                        grid.appendChild(pad);
-
-                        if(ntfy && !historyNotified.has(slot.time)) {
-                            historyNotified.add(slot.time);
-                            sendPush(ntfy, `Tavolo Disponibile Rilevato! Orario: ${slot.time}.`);
+                if(foundSlots.length > 0) {
+                    pushLog(`Rilevati ${foundSlots.length} tavoli disponibili per il giorno ${targetDate}!`, "success");
+                    foundSlots.forEach(time => {
+                        let id = `${targetDate}_${time}`;
+                        if(ntfy && !notifiedSlots.has(id)) {
+                            notifiedSlots.add(id);
+                            fetch(`https://ntfy.sh/${ntfy}`, { method: 'POST', body: `Tavolo LIBERO! Giorno: ${targetDate} ore ${time}` });
                         }
                     });
-                    pushLog(`Scansione eseguita. Rilevati ${slotsFound.length} slot liberi.`, "success");
                 } else {
-                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:30px; font-weight:500; font-size:13px; letter-spacing:0.02em;">Nessun tavolo disponibile per la data selezionata.</div>`;
-                    pushLog(`Controllo completato. Stato: Esaurito.`);
+                    pushLog(`Verifica eseguita per il ${targetDate}: Risorsa Esaurita.`);
                 }
 
-            } catch (error) {
-                pushLog("Connessione instabile o bypass temporaneamente occupato. Riprovo...", "error");
+            } catch (e) {
+                pushLog("Problema di rete o formato dati non compatibile. Attendo il prossimo ciclo.", "error");
             }
         }
 
-        async function sendPush(channel, msg) {
-            try { await fetch(`https://ntfy.sh/${channel}`, { method: 'POST', body: msg }); } catch(e) {}
+        function renderLiveView(date, slots) {
+            const matrixElem = document.getElementById("liveMatrix");
+            matrixElem.innerHTML = "";
+            
+            const row = document.createElement("div");
+            row.className = "date-row";
+            
+            const label = document.createElement("div");
+            label.className = "date-label";
+            label.innerHTML = `<span>📅 Risultati per il: ${date}</span> <span>${slots.length > 0 ? slots.length + ' slot liberi' : 'Sold Out'}</span>`;
+            row.appendChild(label);
+
+            const container = document.createElement("div");
+            container.className = "slots-container";
+            
+            if(slots.length > 0) {
+                slots.sort().forEach(time => {
+                    const pill = document.createElement("div");
+                    pill.className = "slot-pill active";
+                    pill.innerHTML = `<span style="font-size:13px; font-weight:600;">${time}</span><span style="font-size:8px;font-weight:800;">LIBERO</span>`;
+                    container.appendChild(pill);
+                });
+            } else {
+                container.innerHTML = `<div style="font-size:11px; color:var(--red); font-weight:600; text-transform:uppercase; padding:10px 5px;">❌ Tutto esaurito su questa data</div>`;
+            }
+            
+            row.appendChild(container);
+            matrixElem.appendChild(row);
         }
 
-        function pushLog(text, type = "") {
-            const box = document.getElementById("activityBox");
+        function pushLog(msg, type = "") {
+            const log = document.getElementById("activityLog");
+            const entry = document.createElement("div");
+            entry.className = "log-entry";
             const time = new Date().toLocaleTimeString("it-IT");
-            const row = document.createElement("div");
-            row.className = `activity-row ${type}`;
-            row.innerHTML = `<span class="activity-time">[${time}]</span> <span>${text}</span>`;
-            box.insertBefore(row, box.firstChild);
+            entry.innerHTML = `<span class="log-time">[${time}]</span><span class="log-msg ${type}">${msg}</span>`;
+            log.insertBefore(entry, log.firstChild);
         }
     </script>
 </body>
