@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universal Live Slot Monitor</title>
-    
+    <title>Universal Live Slot Monitor v2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --bg: #090a0f; --surface: #131520; --surface-card: #1a1d2c; --border: #23273a;
@@ -28,8 +26,7 @@
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         @media (max-width: 700px) { .input-row { grid-template-columns: 1fr; } }
         .input-wrapper label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
-        .input-wrapper input, .input-wrapper textarea { width: 100%; padding: 14px 16px; background: var(--surface-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; }
-        .input-wrapper textarea { resize: vertical; height: 60px; font-family: monospace; font-size: 12px; }
+        .input-wrapper input { width: 100%; padding: 14px 16px; background: var(--surface-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; }
         .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
         .time-pad { background: var(--surface-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; text-align: center; }
         .time-pad.available { background: var(--green-glow); border-color: var(--green); color: var(--green); }
@@ -46,7 +43,7 @@
     <header>
         <div style="display:flex; align-items:center; gap:10px;">
             <span style="font-size:20px;">🎯</span>
-            <span style="font-weight:700; font-size:16px;">Radar Target Universale</span>
+            <span style="font-weight:700; font-size:16px;">Radar Target Universale v2</span>
             <span id="liveTag" style="font-size:11px; background:var(--border); color:var(--text-muted); padding:3px 8px; border-radius:20px;">Standby</span>
         </div>
         <button class="btn btn-main" id="actionBtn" onclick="toggleSystem()">▶ Avvia Monitoraggio</button>
@@ -58,13 +55,13 @@
             <div class="form-grid">
                 <div class="input-wrapper">
                     <label>Link Completo dell'API da monitorare (URL)</label>
-                    <input type="text" id="apiTargetUrl" placeholder="Incolla qui l'URL rintracciato con F12 (Es: https://secure.plateform.app/api/...)">
+                    <input type="text" id="apiTargetUrl" placeholder="Incolla qui l'URL rintracciato con F12">
                 </div>
                 
                 <div class="input-row">
                     <div class="input-wrapper">
                         <label>Frequenza Controllo (Secondi)</label>
-                        <input type="number" id="loopSeconds" value="15" min="5">
+                        <input type="number" id="loopSeconds" value="12" min="5">
                     </div>
                     <div class="input-wrapper">
                         <label>Canale Notifiche Smartphone (ntfy.sh)</label>
@@ -74,7 +71,7 @@
 
                 <div class="toggle-container">
                     <input type="checkbox" id="useProxy" checked>
-                    <label for="useProxy">Usa Proxy Anti-Blocco / CORS Bypass (Consigliato per siti esterni)</label>
+                    <label for="useProxy">Usa Proxy Avanzato (AllOrigins Bypass)</label>
                 </div>
             </div>
         </div>
@@ -102,21 +99,20 @@
         let engineInterval = null;
         let historyNotified = new Set();
 
-        // Carica impostazioni salvate nel telefono al precedente avvio
         if(localStorage.getItem('saved_api_url')) {
             document.getElementById('apiTargetUrl').value = localStorage.getItem('saved_api_url');
             document.getElementById('ntfyChannel').value = localStorage.getItem('saved_ntfy_channel');
-            document.getElementById('loopSeconds').value = localStorage.getItem('saved_loop_seconds') || 15;
+            document.getElementById('loopSeconds').value = localStorage.getItem('saved_loop_seconds') || 12;
         }
 
         function toggleSystem() {
             const btn = document.getElementById("actionBtn");
             const tag = document.getElementById("liveTag");
             const targetUrl = document.getElementById("apiTargetUrl").value.trim();
-            const secondi = parseInt(document.getElementById("loopSeconds").value) || 15;
+            const secondi = parseInt(document.getElementById("loopSeconds").value) || 12;
 
             if(!targetUrl && !isRunning) {
-                alert("Inserisci prima un link API valido da controllare!");
+                alert("Inserisci prima un link API valido!");
                 return;
             }
 
@@ -132,7 +128,6 @@
                 isRunning = true;
                 historyNotified.clear();
                 
-                // Salva in memoria locale così sul telefono rimangono scritti
                 localStorage.setItem('saved_api_url', targetUrl);
                 localStorage.setItem('saved_ntfy_channel', document.getElementById("ntfyChannel").value.trim());
                 localStorage.setItem('saved_loop_seconds', secondi);
@@ -142,7 +137,7 @@
                 tag.textContent = "LIVE ACTIVE";
                 tag.style.background = "var(--green-glow)"; tag.style.color = "var(--green)";
                 
-                pushLog("Engine Universale Avviato. Analisi della risposta in corso...");
+                pushLog("Engine Corretto Avviato. Connessione in corso...");
                 executeUniversalCheck();
                 engineInterval = setInterval(executeUniversalCheck, secondi * 1000);
             }
@@ -160,28 +155,30 @@
 
             let finalUrl = targetUrl;
             if(useProxy) {
-                finalUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
+                // Cambiato con AllOrigins proxy, molto più tollerante e trasparente
+                finalUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
             }
 
             try {
                 const response = await fetch(finalUrl);
-                const data = await response.json();
+                if (!response.ok) throw new Error("Risposta server non valida");
+                
+                let resData = await response.json();
+                
+                // AllOrigins impacchetta la risposta dentro una proprietà chiamata "contents"
+                let data = useProxy ? JSON.parse(resData.contents) : resData;
                 
                 grid.innerHTML = "";
                 let slotsFound = [];
 
-                // ALGORITMO DI PARSING INTELLIGENTE (Cerca pattern comuni di orari/slot nei JSON)
-                // Funziona con sistemi Plateform, custom API, liste piatte o annidate
                 function searchJsonDeep(obj) {
                     if (!obj || typeof obj !== 'object') return;
 
-                    // Struttura standard Plateform/Tonnarello/Simili
                     if (obj.time && (obj.available === true || obj.free === true || obj.status === 'available')) {
                         slotsFound.push({ time: obj.time, label: 'LIBERO' });
                         return;
                     }
 
-                    // Strutture generiche (es: {"19:30": "available"})
                     for (let key in obj) {
                         if (typeof obj[key] === 'string' && (obj[key].toLowerCase() === 'available' || obj[key].toLowerCase() === 'free')) {
                             if(key.includes(":") || !isNaN(key)) {
@@ -195,38 +192,34 @@
 
                 searchJsonDeep(data);
 
-                // Mostra i risultati a schermo
                 if(slotsFound.length > 0) {
-                    // Ordina gli orari cronologicamente
                     slotsFound.sort((a,b) => a.time.localeCompare(b.time));
-
                     slotsFound.forEach(slot => {
                         const pad = document.createElement("div");
                         pad.className = "time-pad available";
                         pad.innerHTML = `<span>${slot.time}</span><span style="font-size:10px; font-weight:700;">${slot.label}</span>`;
                         grid.appendChild(pad);
 
-                        // Gestione Notifiche push intelligenti per evitare spam
                         if(ntfy && !historyNotified.has(slot.time)) {
                             historyNotified.add(slot.time);
-                            sendPush(ntfy, `Rilevato Slot Libero! Orario: ${slot.time}. Controlla subito!`);
+                            sendPush(ntfy, `Slot Libero Rilevato! Orario: ${slot.time}.`);
                         }
                     });
-                    pushLog(`Scansione OK. Trovati ${slotsFound.length} slot disponibili in questo momento!`, "success");
+                    pushLog(`Connessione riuscita. Rilevati ${slotsFound.length} slot disponibili!`, "success");
                 } else {
-                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:20px; font-weight:600;">❌ Tutto esaurito o nessun parametro rilevato. Monitoraggio continuo attivo...</div>`;
-                    pushLog("Nessuno slot libero rilevato nell'ultimo controllo.");
+                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:20px; font-weight:600;">❌ Tutto esaurito su questa risorsa. Continuo a monitorare...</div>`;
+                    pushLog("Dati ricevuti: nessun posto libero al momento.");
                 }
 
             } catch (error) {
-                pushLog("Errore di connessione o formato dati non compatibile.", "error");
+                pushLog("Errore di formato o blocco di rete. Controlla il link inserito.", "error");
             }
         }
 
         async function sendPush(channel, msg) {
             try {
                 await fetch(`https://ntfy.sh/${channel}`, { method: 'POST', body: msg });
-                pushLog(`[NOTIFICA] Inviato avviso push sul canale: ${channel}`, "success");
+                pushLog(`[NOTIFICA] Avviso inviato su ntfy.sh/${channel}`, "success");
             } catch(e) {}
         }
 
