@@ -3,33 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockTheSpot Premium Target Radar v7.0</title>
+    <title>LockTheSpot Premium Target Radar v7.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        body {
-            font-family: 'Share Tech Mono', monospace;
-        }
+        body { font-family: 'Share Tech Mono', monospace; }
         .neon-border {
             box-shadow: 0 0 10px rgba(34, 197, 94, 0.2), inset 0 0 10px rgba(34, 197, 94, 0.2);
             border: 1px solid rgba(34, 197, 94, 0.5);
         }
-        .neon-text {
-            text-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090d16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #166534;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #22c55e;
-        }
+        .neon-text { text-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #166534; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #22c55e; }
     </style>
 </head>
 <body class="bg-[#030712] text-gray-300 min-h-screen flex flex-col justify-between selection:bg-green-500 selection:text-black">
@@ -38,12 +25,12 @@
         <div>
             <h1 class="text-xl md:text-2xl font-bold tracking-wider text-green-500 neon-text flex items-center gap-2">
                 <span>[🛰️] LOCKTHESPOT</span>
-                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v7.0</span>
+                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v7.1</span>
             </h1>
-            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Premium Target Availability Scanner</p>
+            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Premium Target Availability Scanner (Cloudflare Routing)</p>
         </div>
         <div id="radarBadge" class="hidden items-center gap-2 px-3 py-1 bg-green-950/30 border border-green-500/30 rounded text-xs text-green-400">
-            <span class="w-2 height-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
             <span class="tracking-widest uppercase">SCANNING MODE ACTIVE</span>
         </div>
     </header>
@@ -76,7 +63,7 @@
                 <div class="bg-[#090f1e] border border-gray-900 rounded-xl p-5 shadow-2xl">
                     <h2 class="text-sm uppercase tracking-widest text-green-500 mb-4 pb-2 border-b border-gray-800/60 flex items-center justify-between">
                         <span>Configurazione Target</span>
-                        <span class="text-xs text-gray-600">AES-GCM SECURE</span>
+                        <span class="text-xs text-gray-600">AES-GCM + CLOUDFLARE</span>
                     </h2>
                     <div class="space-y-4 text-xs">
                         <div>
@@ -140,7 +127,7 @@
     </main>
 
     <footer class="border-t border-gray-900 bg-[#040814] px-6 py-3 text-center text-[10px] text-gray-600 tracking-widest uppercase">
-        LockTheSpot Matrix Engine v7.0 • Secured Browser Infrastructure
+        LockTheSpot Matrix Engine v7.1 • Secured Browser Infrastructure
     </footer>
 
     <script>
@@ -376,7 +363,7 @@
         }
 
         async function executeScan(baseApiUrl, date, covers, ntfyChannel) {
-            logEntry("Checking target endpoint status...", "info");
+            logEntry("Checking target endpoint status via Cloudflare Edge...", "info");
             
             let finalUrl = baseApiUrl;
             try {
@@ -390,14 +377,19 @@
                 } else {
                     finalUrl += `&covers=${covers}`;
                 }
+                
+                // Anti-cache injection
+                finalUrl += `&_nocache=${new Date().getTime()}`;
             } catch(err) {
                 logEntry("Errore formattazione dinamica parametri URL.", "error");
             }
 
+            // INIEZIONE ROUTING PROXY DI CLOUDFLARE PER ABBATTERE IL CORS
+            const cloudflareProxyUrl = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
+
             try {
-                const response = await fetch(finalUrl, {
+                const response = await fetch(cloudflareProxyUrl, {
                     method: "GET",
-                    credentials: "include",
                     headers: {
                         "Accept": "application/json"
                     }
@@ -409,7 +401,7 @@
                 }
 
                 if (!response.ok) {
-                    logEntry(`HTTP Error rilevato dall'endpoint: Status ${response.status}`, "warn");
+                    logEntry(`HTTP Error rilevato dall'endpoint Cloudflare Proxy: Status ${response.status}`, "warn");
                     return;
                 }
 
@@ -417,7 +409,7 @@
                 parseResponse(json, date, ntfyChannel);
 
             } catch (e) {
-                logEntry("Fetch fallito o violazione CORS network layer. Controllo in coda.", "error");
+                logEntry("Eccezione di rete o risposta non valida dal proxy. Controllo in coda.", "error");
             }
         }
 
@@ -425,6 +417,7 @@
             let found = false;
             let capturedSlots = [];
 
+            // Estrattore ricorsivo profondo per formati JSON flessibili Plateform
             function traverse(obj) {
                 if (!obj || typeof obj !== 'object') return;
 
