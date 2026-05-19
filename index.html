@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universal Live Slot Monitor v2</title>
+    <title>Universal Live Slot Monitor v3</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -42,8 +42,8 @@
 
     <header>
         <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:20px;">🎯</span>
-            <span style="font-weight:700; font-size:16px;">Radar Target Universale v2</span>
+            <span style="font-size:20px;">⚡</span>
+            <span style="font-weight:700; font-size:16px;">Radar Universale Multi-Proxy v3</span>
             <span id="liveTag" style="font-size:11px; background:var(--border); color:var(--text-muted); padding:3px 8px; border-radius:20px;">Standby</span>
         </div>
         <button class="btn btn-main" id="actionBtn" onclick="toggleSystem()">▶ Avvia Monitoraggio</button>
@@ -71,7 +71,7 @@
 
                 <div class="toggle-container">
                     <input type="checkbox" id="useProxy" checked>
-                    <label for="useProxy">Usa Proxy Avanzato (AllOrigins Bypass)</label>
+                    <label for="useProxy">Usa Rete di Proxy Auto-Rotanti (Consigliato contro i blocchi)</label>
                 </div>
             </div>
         </div>
@@ -98,6 +98,7 @@
         let isRunning = false;
         let engineInterval = null;
         let historyNotified = new Set();
+        let proxyIndex = 0; // Serve a far ruotare i proxy in caso di errore
 
         if(localStorage.getItem('saved_api_url')) {
             document.getElementById('apiTargetUrl').value = localStorage.getItem('saved_api_url');
@@ -112,7 +113,7 @@
             const secondi = parseInt(document.getElementById("loopSeconds").value) || 12;
 
             if(!targetUrl && !isRunning) {
-                alert("Inserisci prima un link API valido!");
+                alert("Inserisci un link valido!");
                 return;
             }
 
@@ -127,6 +128,7 @@
             } else {
                 isRunning = true;
                 historyNotified.clear();
+                proxyIndex = 0; 
                 
                 localStorage.setItem('saved_api_url', targetUrl);
                 localStorage.setItem('saved_ntfy_channel', document.getElementById("ntfyChannel").value.trim());
@@ -137,9 +139,43 @@
                 tag.textContent = "LIVE ACTIVE";
                 tag.style.background = "var(--green-glow)"; tag.style.color = "var(--green)";
                 
-                pushLog("Engine Corretto Avviato. Connessione in corso...");
+                pushLog("Engine Corazzato v3 Avviato. Scansione profonda...");
                 executeUniversalCheck();
                 engineInterval = setInterval(executeUniversalCheck, secondi * 1000);
+            }
+        }
+
+        async function fetchWithProxyFallback(targetUrl, useProxy) {
+            if(!useProxy) {
+                let res = await fetch(targetUrl);
+                return await res.json();
+            }
+
+            // Lista di 3 proxy con architetture totalmente diverse
+            const proxyPool = [
+                (url) => "https://corsproxy.io/?" + encodeURIComponent(url),
+                async (url) => {
+                    let r = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url));
+                    let j = await r.json();
+                    return JSON.parse(j.contents);
+                },
+                (url) => "https://api.isthereanydeal.com/proxy?url=" + encodeURIComponent(url)
+            ];
+
+            // Tenta il proxy corrente
+            try {
+                let currentProxy = proxyPool[proxyIndex];
+                if(proxyIndex === 1) {
+                    // AllOrigins ha bisogno della sua logica asincrona interna
+                    return await currentProxy(targetUrl);
+                } else {
+                    let res = await fetch(currentProxy(targetUrl));
+                    return await res.json();
+                }
+            } catch(e) {
+                // Se fallisce, fa ruotare l'indice per usare il proxy successivo al prossimo giro
+                proxyIndex = (proxyIndex + 1) % proxyPool.length;
+                throw new Error("Proxy instabile, deviazione traffico al prossimo controllo...");
             }
         }
 
@@ -150,23 +186,10 @@
             const grid = document.getElementById("matrixGrid");
             const timeField = document.getElementById("lastCheckTime");
 
-            const timestamp = new Date().toLocaleTimeString("it-IT");
-            timeField.textContent = `Ultimo check: ${timestamp}`;
-
-            let finalUrl = targetUrl;
-            if(useProxy) {
-                // Cambiato con AllOrigins proxy, molto più tollerante e trasparente
-                finalUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
-            }
+            timeField.textContent = `Ultimo check: ${new Date().toLocaleTimeString("it-IT")}`;
 
             try {
-                const response = await fetch(finalUrl);
-                if (!response.ok) throw new Error("Risposta server non valida");
-                
-                let resData = await response.json();
-                
-                // AllOrigins impacchetta la risposta dentro una proprietà chiamata "contents"
-                let data = useProxy ? JSON.parse(resData.contents) : resData;
+                let data = await fetchWithProxyFallback(targetUrl, useProxy);
                 
                 grid.innerHTML = "";
                 let slotsFound = [];
@@ -202,25 +225,22 @@
 
                         if(ntfy && !historyNotified.has(slot.time)) {
                             historyNotified.add(slot.time);
-                            sendPush(ntfy, `Slot Libero Rilevato! Orario: ${slot.time}.`);
+                            sendPush(ntfy, `Slot Rilevato! Orario: ${slot.time}.`);
                         }
                     });
-                    pushLog(`Connessione riuscita. Rilevati ${slotsFound.length} slot disponibili!`, "success");
+                    pushLog(`Connessione OK stabile (Proxy Canale ${proxyIndex+1}). Trovati ${slotsFound.length} slot!`, "success");
                 } else {
-                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:20px; font-weight:600;">❌ Tutto esaurito su questa risorsa. Continuo a monitorare...</div>`;
-                    pushLog("Dati ricevuti: nessun posto libero al momento.");
+                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:20px; font-weight:600;">❌ Tutto esaurito su questa risorsa. In monitoraggio...</div>`;
+                    pushLog(`Dati analizzati correttamente. Risorsa attualmente Sold-Out.`);
                 }
 
             } catch (error) {
-                pushLog("Errore di formato o blocco di rete. Controlla il link inserito.", "error");
+                pushLog(error.message || "Errore di risposta.", "error");
             }
         }
 
         async function sendPush(channel, msg) {
-            try {
-                await fetch(`https://ntfy.sh/${channel}`, { method: 'POST', body: msg });
-                pushLog(`[NOTIFICA] Avviso inviato su ntfy.sh/${channel}`, "success");
-            } catch(e) {}
+            try { await fetch(`https://ntfy.sh/${channel}`, { method: 'POST', body: msg }); } catch(e) {}
         }
 
         function pushLog(text, type = "") {
@@ -234,3 +254,4 @@
     </script>
 </body>
 </html>
+
