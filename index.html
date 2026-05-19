@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockTheSpot Premium Target Radar v7.1</title>
+    <title>LockTheSpot Premium Target Radar v7.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
@@ -25,9 +25,9 @@
         <div>
             <h1 class="text-xl md:text-2xl font-bold tracking-wider text-green-500 neon-text flex items-center gap-2">
                 <span>[🛰️] LOCKTHESPOT</span>
-                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v7.1</span>
+                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v7.2</span>
             </h1>
-            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Premium Target Availability Scanner (Cloudflare Routing)</p>
+            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Premium Target Availability Scanner (Persistence Engine)</p>
         </div>
         <div id="radarBadge" class="hidden items-center gap-2 px-3 py-1 bg-green-950/30 border border-green-500/30 rounded text-xs text-green-400">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
@@ -35,40 +35,40 @@
         </div>
     </header>
 
-    <main class="flex-grow p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="flex-grow p-4 md:p-6 max-w-7xl mx-auto w-full flex items-center justify-center">
         
-        <section id="vaultSection" class="lg:col-span-12 max-w-md mx-auto w-full my-auto transition-all duration-300">
+        <section id="vaultSection" class="max-w-md mx-auto w-full my-auto transition-all duration-300">
             <div class="bg-[#090f1e] neon-border rounded-xl p-6 md:p-8">
                 <div class="text-center mb-6">
                     <div class="inline-block p-3 bg-green-950/50 rounded-full border border-green-900 text-green-400 text-2xl mb-2">🔐</div>
-                    <h2 class="text-lg uppercase tracking-wider text-green-400">Secure Vault Access</h2>
-                    <p class="text-xs text-gray-500 mt-1">Derivazione chiave PBKDF2 e cifratura simmetrica AES-GCM locale</p>
+                    <h2 id="vaultTitle" class="text-lg uppercase tracking-wider text-green-400">Configura Password Vault</h2>
+                    <p id="vaultSub" class="text-xs text-gray-500 mt-1">Imposta una password master per iniziare a cifrare i tuoi dati.</p>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs uppercase tracking-wider text-green-600 mb-1">Master Password</label>
                         <input type="password" id="masterPassword" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-green-400 px-4 py-3 rounded outline-none transition-colors text-sm" placeholder="••••••••••••••••">
                     </div>
-                    <button onclick="unlockVault()" class="w-full bg-green-900/20 hover:bg-green-500 hover:text-black border border-green-500 text-green-400 font-bold uppercase tracking-widest py-3 rounded text-sm transition-all duration-200">
-                        Sblocca Vault
+                    <button id="vaultBtn" onclick="processVaultAction()" class="w-full bg-green-900/20 hover:bg-green-500 hover:text-black border border-green-500 text-green-400 font-bold uppercase tracking-widest py-3 rounded text-sm transition-all duration-200">
+                        Imposta & Sblocca
                     </button>
                     <div id="vaultError" class="text-xs text-red-400 text-center uppercase tracking-wider hidden"></div>
                 </div>
             </div>
         </section>
 
-        <div id="dashboardContainer" class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6 hidden opacity-0 transition-opacity duration-500">
+        <div id="dashboardContainer" class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 hidden opacity-0 transition-opacity duration-500">
             
             <section class="lg:col-span-5 flex flex-col gap-6">
                 <div class="bg-[#090f1e] border border-gray-900 rounded-xl p-5 shadow-2xl">
                     <h2 class="text-sm uppercase tracking-widest text-green-500 mb-4 pb-2 border-b border-gray-800/60 flex items-center justify-between">
                         <span>Configurazione Target</span>
-                        <span class="text-xs text-gray-600">AES-GCM + CLOUDFLARE</span>
+                        <span class="text-xs text-gray-600">AES-GCM PERMANENT</span>
                     </h2>
                     <div class="space-y-4 text-xs">
                         <div>
                             <label class="block uppercase tracking-wider text-gray-400 mb-1">Target API Endpoint URL</label>
-                            <input type="text" id="targetUrl" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="https://secure.plateform.app/api/v1/business/...">
+                            <input type="text" id="targetUrl" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="Incolla l'URL pulito qui (senza date fisse o counter)...">
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -94,8 +94,8 @@
                             <button id="btnToggle" onclick="toggleRadar()" class="flex-1 bg-green-950/40 border border-green-600 hover:bg-green-500 hover:text-black text-green-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200">
                                 Avvia Scanner
                             </button>
-                            <button onclick="lockVault()" class="bg-red-950/20 border border-red-900 text-red-400 hover:bg-red-900/40 px-3 rounded transition-all duration-200" title="Blocca Cassaforte">
-                                🔒 Lock
+                            <button onclick="lockVault()" class="bg-red-950/20 border border-red-900 text-red-400 hover:bg-red-900/40 px-3 rounded transition-all duration-200" title="Rimuovi sessione locale e blocca">
+                                🔒 Chiudi Sessione
                             </button>
                         </div>
                     </div>
@@ -106,8 +106,8 @@
                         <span class="text-xl">🎉</span>
                         <div>
                             <h3 class="text-green-400 font-bold uppercase tracking-wider text-sm">Disponibilità Intercettata!</h3>
-                            <p class="text-xs text-gray-300 mt-1" id="alertDetails">Slot liberi rilevati all'interno della risposta JSON del server.</p>
-                            <div class="mt-2 flex gap-2" id="slotContainer"></div>
+                            <p class="text-xs text-gray-300 mt-1" id="alertDetails"></p>
+                            <div class="mt-2 flex flex-wrap gap-2" id="slotContainer"></div>
                         </div>
                     </div>
                 </div>
@@ -119,7 +119,7 @@
                         <span>Console Log di Sistema</span>
                         <button onclick="clearLogs()" class="text-[10px] text-gray-500 hover:text-gray-300 uppercase tracking-wider">[Pulisci]</button>
                     </h2>
-                    <div id="terminalLog" class="flex-grow bg-[#030712] border border-gray-950 rounded p-4 font-mono text-xs overflow-y-auto space-y-1.5 min-h-[300px] max-h-[500px]"></div>
+                    <div id="terminalLog" class="flex-grow bg-[#030712] border border-gray-950 rounded p-4 font-mono text-xs overflow-y-auto space-y-1.5 min-h-[350px] max-h-[550px]"></div>
                 </div>
             </section>
 
@@ -127,13 +127,42 @@
     </main>
 
     <footer class="border-t border-gray-900 bg-[#040814] px-6 py-3 text-center text-[10px] text-gray-600 tracking-widest uppercase">
-        LockTheSpot Matrix Engine v7.1 • Secured Browser Infrastructure
+        LockTheSpot Matrix Engine v7.2 • Secured Browser Infrastructure
     </footer>
 
     <script>
         let intervalId = null;
         let globalKey = null;
         let audioCtx = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkExistingVaultSetup();
+        });
+
+        function checkExistingVaultSetup() {
+            const hasSalt = localStorage.getItem("lts_salt");
+            const hasAuthCheck = localStorage.getItem("lts_auth_check");
+            const title = document.getElementById("vaultTitle");
+            const sub = document.getElementById("vaultSub");
+            const btn = document.getElementById("vaultBtn");
+
+            if (hasSalt && hasAuthCheck) {
+                title.innerText = "Sblocca Vault Esistente";
+                sub.innerText = "Inserisci la Master Password impostata precedentemente per decifrare l'app.";
+                btn.textContent = "Sblocca Vault";
+                
+                // Se è presente una password di sessione temporanea attiva, esegui auto-login
+                const sessionKey = sessionStorage.getItem("lts_session_pass");
+                if (sessionKey) {
+                    document.getElementById("masterPassword").value = sessionKey;
+                    processVaultAction();
+                }
+            } else {
+                title.innerText = "Configura Password Vault";
+                sub.innerText = "Inserisci una password sicura. Chiunque usi questa installazione dovrà immetterla per vedere o modificare i dati.";
+                btn.textContent = "Inizializza & Sblocca";
+            }
+        }
 
         function playBeep() {
             try {
@@ -155,13 +184,12 @@
                 
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.3);
-            } catch (e) {
-                logEntry("Impossibile riprodurre alert audio: " + e.message, "error");
-            }
+            } catch (e) {}
         }
 
         function logEntry(msg, type = "info") {
             const terminal = document.getElementById("terminalLog");
+            if (!terminal) return;
             const entry = document.createElement("div");
             const time = new Date().toLocaleTimeString("it-IT");
             
@@ -207,9 +235,7 @@
         }
 
         function bufferToHex(buffer) {
-            return Array.from(new Uint8Array(buffer))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('');
+            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         function hexToBuffer(hex) {
@@ -228,10 +254,7 @@
                 key,
                 encoder.encode(text)
             );
-            return {
-                ciphertext: bufferToHex(encrypted),
-                iv: bufferToHex(iv)
-            };
+            return { ciphertext: bufferToHex(encrypted), iv: bufferToHex(iv) };
         }
 
         async function decryptData(ciphertextHex, ivHex, key) {
@@ -247,7 +270,7 @@
             }
         }
 
-        async function unlockVault() {
+        async function processVaultAction() {
             const passwordInput = document.getElementById("masterPassword").value;
             const errorElement = document.getElementById("vaultError");
             errorElement.classList.add("hidden");
@@ -261,8 +284,9 @@
             try {
                 let saltHex = localStorage.getItem("lts_salt");
                 let salt;
+                const isFirstSetup = !saltHex;
                 
-                if (!saltHex) {
+                if (isFirstSetup) {
                     salt = crypto.getRandomValues(new Uint8Array(16));
                     localStorage.setItem("lts_salt", bufferToHex(salt));
                 } else {
@@ -271,23 +295,40 @@
 
                 globalKey = await getDerivedKey(passwordInput, salt);
                 
-                const storedCipher = localStorage.getItem("lts_encryptedUrl");
-                const storedIv = localStorage.getItem("lts_iv");
-                
-                if (storedCipher && storedIv) {
-                    const decryptedUrl = await decryptData(storedCipher, storedIv, globalKey);
-                    if (decryptedUrl === null) {
-                        errorElement.innerText = "Master password non valida.";
+                if (isFirstSetup) {
+                    // Crea un marker di controllo cifrando una stringa nota per verificare i futuri sblocchi
+                    const authCheck = await encryptData("VAULT_VERIFIED", globalKey);
+                    localStorage.setItem("lts_auth_check", authCheck.ciphertext);
+                    localStorage.setItem("lts_auth_iv", authCheck.iv);
+                } else {
+                    // Verifica la correttezza della password decifrando il marker
+                    const checkCipher = localStorage.getItem("lts_auth_check");
+                    const checkIv = localStorage.getItem("lts_auth_iv");
+                    const verified = await decryptData(checkCipher, checkIv, globalKey);
+                    
+                    if (verified !== "VAULT_VERIFIED") {
+                        errorElement.innerText = "Master password Errata. Impossibile decifrare.";
                         errorElement.classList.remove("hidden");
                         globalKey = null;
                         return;
                     }
-                    document.getElementById("targetUrl").value = decryptedUrl;
+                }
+
+                // Salva la password in sessionStorage per mantenere l'autenticazione attiva al refresh della pagina
+                sessionStorage.setItem("lts_session_pass", passwordInput);
+
+                // Carica i dati precedentemente cifrati se presenti
+                const storedCipher = localStorage.getItem("lts_encryptedUrl");
+                const storedIv = localStorage.getItem("lts_iv");
+                if (storedCipher && storedIv) {
+                    const decryptedUrl = await decryptData(storedCipher, storedIv, globalKey);
+                    if (decryptedUrl) document.getElementById("targetUrl").value = decryptedUrl;
                 }
 
                 const savedNtfy = localStorage.getItem("lts_ntfy");
                 if (savedNtfy) document.getElementById("ntfyChannel").value = savedNtfy;
 
+                // Mostra la dashboard
                 document.getElementById("vaultSection").classList.add("hidden");
                 const dashboard = document.getElementById("dashboardContainer");
                 dashboard.classList.remove("hidden");
@@ -296,10 +337,10 @@
                 const oggi = new Date().toISOString().split('T')[0];
                 document.getElementById('targetDate').value = oggi;
                 
-                logEntry("Vault sbloccato con successo via hardware crypto API.", "info");
+                logEntry("Vault autenticato correttamente. Crittografia AES-GCM operativa.", "success");
 
             } catch (e) {
-                errorElement.innerText = "Errore inizializzazione: " + e.message;
+                errorElement.innerText = "Errore: " + e.message;
                 errorElement.classList.remove("hidden");
             }
         }
@@ -307,14 +348,19 @@
         function lockVault() {
             if(intervalId) toggleRadar();
             globalKey = null;
+            sessionStorage.removeItem("lts_session_pass");
+            localStorage.clear(); // Resetta l'intero storage per rimuovere credenziali e link vecchi
+            
             document.getElementById("masterPassword").value = "";
             document.getElementById("targetUrl").value = "";
+            document.getElementById("ntfyChannel").value = "";
             
             const dashboard = document.getElementById("dashboardContainer");
             dashboard.classList.add("opacity-0");
             setTimeout(() => {
                 dashboard.classList.add("hidden");
                 document.getElementById("vaultSection").classList.remove("hidden");
+                checkExistingVaultSetup();
             }, 500);
         }
 
@@ -328,9 +374,9 @@
                 btn.textContent = "Avvia Scanner";
                 btn.className = "flex-1 bg-green-950/40 border border-green-600 hover:bg-green-500 hover:text-black text-green-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200";
                 badge.classList.add("hidden");
-                logEntry("Engine di scansione arrestato dal supervisore.");
+                logEntry("Engine di scansione arrestato.");
             } else {
-                const url = document.getElementById("targetUrl").value.trim();
+                let url = document.getElementById("targetUrl").value.trim();
                 const date = document.getElementById("targetDate").value;
                 const covers = document.getElementById("targetCovers").value;
                 const freq = parseInt(document.getElementById("targetFreq").value) || 10;
@@ -339,13 +385,28 @@
                 if (!url) { logEntry("Parametro mancante: Target API URL richiesto.", "error"); return; }
                 if (!date) { logEntry("Parametro mancante: Data di monitoraggio richiesta.", "error"); return; }
 
+                // Pulisce l'URL in ingresso rimuovendo parametri preimpostati o residui di test precedenti per evitare conflitti o errori 404
+                try {
+                    let urlObj = new URL(url);
+                    urlObj.searchParams.delete("date");
+                    urlObj.searchParams.delete("covers");
+                    urlObj.searchParams.delete("_nocache");
+                    url = urlObj.toString();
+                    document.getElementById("targetUrl").value = url;
+                } catch(e) {
+                    // Se l'utente non passa un URL standard ma un percorso parziale, esegui pulizia regex di fallback
+                    url = url.replace(/([\?&])date=[^&]*/g, '').replace(/([\?&])covers=[^&]*/g, '').replace(/([\?&])_nocache=[^&]*/g, '');
+                    url = url.replace(/&\s*$/, '').replace(/\?\s*$/, '');
+                    document.getElementById("targetUrl").value = url;
+                }
+
                 try {
                     const encryptedData = await encryptData(url, globalKey);
                     localStorage.setItem("lts_encryptedUrl", encryptedData.ciphertext);
                     localStorage.setItem("lts_iv", encryptedData.iv);
                     if(ntfy) localStorage.setItem("lts_ntfy", ntfy);
                 } catch(e) {
-                    logEntry("Errore salvataggio protetto parametri: " + e.message, "error");
+                    logEntry("Errore cifratura parametri: " + e.message, "error");
                     return;
                 }
 
@@ -353,7 +414,7 @@
                 btn.className = "flex-1 bg-red-950/40 border border-red-600 hover:bg-red-500 hover:text-black text-red-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200";
                 badge.classList.remove("hidden");
 
-                logEntry(`Scan started - Frequenza impostata: ogni ${freq} secondi.`, "info");
+                logEntry(`Scan started - Analisi impostata ogni ${freq} secondi.`, "info");
                 
                 executeScan(url, date, covers, ntfy);
                 intervalId = setInterval(() => {
@@ -366,42 +427,34 @@
             logEntry("Checking target endpoint status via Cloudflare Edge...", "info");
             
             let finalUrl = baseApiUrl;
-            try {
-                if (finalUrl.includes("date=")) {
-                    finalUrl = finalUrl.replace(/date=\d{4}-\d{2}-\d{2}/, `date=${date}`);
-                } else {
-                    finalUrl += (finalUrl.includes("?") ? "&" : "?") + `date=${date}`;
-                }
-                if (finalUrl.includes("covers=")) {
-                    finalUrl = finalUrl.replace(/covers=\d+/, `covers=${covers}`);
-                } else {
-                    finalUrl += `&covers=${covers}`;
-                }
-                
-                // Anti-cache injection
-                finalUrl += `&_nocache=${new Date().getTime()}`;
-            } catch(err) {
-                logEntry("Errore formattazione dinamica parametri URL.", "error");
+            // Genera l'URL iniettando in modo pulito i parametri aggiornati della dashboard
+            if (finalUrl.includes("?")) {
+                finalUrl += `&date=${date}&covers=${covers}`;
+            } else {
+                finalUrl += `?date=${date}&covers=${covers}`;
             }
+            finalUrl += `&_nocache=${new Date().getTime()}`;
 
-            // INIEZIONE ROUTING PROXY DI CLOUDFLARE PER ABBATTERE IL CORS
             const cloudflareProxyUrl = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
 
             try {
                 const response = await fetch(cloudflareProxyUrl, {
                     method: "GET",
-                    headers: {
-                        "Accept": "application/json"
-                    }
+                    headers: { "Accept": "application/json" }
                 });
 
                 if (response.status === 401 || response.status === 403) {
-                    logEntry(`Accesso negato dal server remoto (HTTP ${response.status}). Autenticazione fallita o scaduta.`, "error");
+                    logEntry(`Accesso negato dalla risorsa (HTTP ${response.status}).`, "error");
+                    return;
+                }
+
+                if (response.status === 404) {
+                    logEntry(`Errore HTTP 404: Endpoint non trovato. Verifica la struttura dell'URL di base fornito.`, "error");
                     return;
                 }
 
                 if (!response.ok) {
-                    logEntry(`HTTP Error rilevato dall'endpoint Cloudflare Proxy: Status ${response.status}`, "warn");
+                    logEntry(`Risposta anomala dall'endpoint proxy: HTTP Status ${response.status}`, "warn");
                     return;
                 }
 
@@ -409,7 +462,7 @@
                 parseResponse(json, date, ntfyChannel);
 
             } catch (e) {
-                logEntry("Eccezione di rete o risposta non valida dal proxy. Controllo in coda.", "error");
+                logEntry("Eccezione di rete o fallimento routing proxy. In coda per il prossimo tentativo.", "error");
             }
         }
 
@@ -417,7 +470,6 @@
             let found = false;
             let capturedSlots = [];
 
-            // Estrattore ricorsivo profondo per formati JSON flessibili Plateform
             function traverse(obj) {
                 if (!obj || typeof obj !== 'object') return;
 
@@ -451,7 +503,7 @@
             traverse(data);
 
             if (found) {
-                logEntry(`Availability found! Rilevati parametri di risorsa libera per il ${date}.`, "success");
+                logEntry(`Availability found! Posti liberi intercettati per il giorno ${date}.`, "success");
                 playBeep();
                 
                 const alertBox = document.getElementById("alertBox");
@@ -460,7 +512,7 @@
                 
                 container.innerHTML = "";
                 alertBox.classList.remove("hidden");
-                details.innerText = `Intercettata disponibilità attiva per il giorno ${date}.`;
+                details.innerText = `Rilevata disponibilità per il giorno ${date}.`;
                 
                 if (capturedSlots.length > 0) {
                     const uniqueSlots = [...new Set(capturedSlots)].sort();
@@ -476,23 +528,23 @@
                     sendNtfyNotification(ntfyChannel, date, capturedSlots);
                 }
             } else {
-                logEntry(`Verifica completata per il ${date}: Risorsa attualmente esaurita.`, "info");
+                logEntry(`Verifica eseguita per il ${date}: Risorsa attualmente esaurita (Sold Out).`, "info");
                 document.getElementById("alertBox").classList.add("hidden");
             }
         }
 
         async function sendNtfyNotification(channel, date, slots) {
             let message = `Tavolo disponibile trovato per il giorno ${date}!`;
-            if (slots.length > 0) message += ` Orari: ${[...new Set(slots)].join(" - ")}`;
+            if (slots.length > 0) message += ` Orari disponibili: ${[...new Set(slots)].join(" - ")}`;
             
             try {
                 await fetch(`https://ntfy.sh/${channel}`, {
                     method: 'POST',
                     body: message
                 });
-                logEntry(`Notifica push inoltrata sul canale ntfy: ${channel}`, "info");
+                logEntry(`Notifica inoltrata correttamente su ntfy channel: ${channel}`, "info");
             } catch (err) {
-                logEntry("Impossibile contattare il gateway di notifica ntfy.sh", "error");
+                logEntry("Impossibile contattare la piattaforma ntfy.sh per le notifiche.", "error");
             }
         }
     </script>
