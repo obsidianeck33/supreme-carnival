@@ -3,92 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universal Live Slot Monitor v4</title>
+    <title>Radar Target Premium v5</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #090a0f; --surface: #131520; --surface-card: #1a1d2c; --border: #23273a;
-            --text: #ffffff; --text-muted: #94a3b8; --green: #10b981; --green-glow: rgba(16, 185, 129, 0.12);
-            --red: #f43f5e; --red-glow: rgba(244, 63, 94, 0.12); --accent: #3b82f6;
+            --bg-marble: #f4f5f7;
+            --surface: rgba(255, 255, 255, 0.85);
+            --surface-card: #ffffff;
+            --border: #e2e8f0;
+            --gold: #bc9c6a;
+            --gold-light: rgba(188, 156, 106, 0.1);
+            --gold-dark: #8c6d3f;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --green: #0f766e;
+            --green-bg: rgba(15, 118, 110, 0.08);
+            --red: #be123c;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 60px; font-size: 14px; }
-        header { background: rgba(9, 10, 15, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; height: 72px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .btn { background: var(--surface-card); color: var(--text); border: 1px solid var(--border); padding: 12px 22px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-main { background: var(--text); color: var(--bg); border: 1px solid var(--text); }
-        .btn-main.running { background: var(--red); color: var(--text); border-color: var(--red); box-shadow: 0 4px 12px var(--red-glow); }
-        main { max-width: 1040px; margin: 0 auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 24px; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-        .card-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 16px; }
-        .form-grid { display: flex; flex-direction: column; gap: 16px; }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 700px) { .input-row { grid-template-columns: 1fr; } }
-        .input-wrapper label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
-        .input-wrapper input { width: 100%; padding: 14px 16px; background: var(--surface-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; }
-        .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-        .time-pad { background: var(--surface-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; text-align: center; }
-        .time-pad.available { background: var(--green-glow); border-color: var(--green); color: var(--green); }
-        .activity-container { background: var(--surface-card); border: 1px solid var(--border); border-radius: 12px; height: 180px; overflow-y: auto; padding: 16px; font-size: 12px; display: flex; flex-direction: column; gap: 6px; }
-        .activity-row { display: flex; gap: 10px; }
-        .activity-time { color: var(--text-muted); flex-shrink: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-font-smoothing: antialiased; }
+        
+        body { 
+            background: var(--bg-marble);
+            /* Texture effetto marmo soft */
+            background-image: 
+                linear-gradient(120deg, rgba(255,255,255,0.6) 0%, rgba(240,242,245,0.7) 100%),
+                radial-gradient(at 20% 20%, rgba(226,232,240,0.4) 0px, transparent 50%),
+                radial-gradient(at 80% 40%, rgba(203,213,225,0.3) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-dark); 
+            padding-bottom: 40px; 
+            font-size: 14px; 
+        }
+        
+        header { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(188, 156, 106, 0.2); 
+            padding: 0 24px; 
+            height: 80px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+        }
+
+        .brand-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 0.08em;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, #1e293b 0%, #bc9c6a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .btn { 
+            background: var(--surface-card); 
+            color: var(--gold-dark); 
+            border: 1px solid var(--gold); 
+            padding: 12px 24px; 
+            border-radius: 30px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 2px 10px rgba(188, 156, 106, 0.05);
+        }
+        .btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+        .btn-main { background: var(--text-dark); color: #ffffff; border: 1px solid var(--text-dark); }
+        .btn-main:hover { background: #0f172a; }
+        .btn-main.running { background: var(--red); color: #ffffff; border-color: var(--red); box-shadow: 0 4px 15px rgba(190, 18, 60, 0.2); }
+        
+        main { max-width: 800px; margin: 0 auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
+        
+        .card { 
+            background: var(--surface); 
+            border: 1px solid rgba(255, 255, 255, 0.7); 
+            border-radius: 24px; 
+            padding: 28px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .card-title { 
+            font-family: 'Cinzel', serif;
+            font-size: 12px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: var(--gold-dark); 
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title::after { content: ''; flex-grow: 1; height: 1px; background: linear-gradient(to right, rgba(188,156,106,0.2), transparent); }
+        
+        .form-grid { display: flex; flex-direction: column; gap: 20px; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .input-row { grid-template-columns: 1fr; } }
+        
+        .input-wrapper label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+        .input-wrapper input { 
+            width: 100%; 
+            padding: 14px 18px; 
+            background: rgba(255,255,255,0.9); 
+            border: 1px solid var(--border); 
+            border-radius: 14px; 
+            color: var(--text-dark); 
+            font-size: 14px; 
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.01);
+        }
+        .input-wrapper input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); }
+        
+        .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+        
+        .time-pad { 
+            background: #ffffff; 
+            border: 1px solid var(--border); 
+            border-radius: 16px; 
+            padding: 16px 10px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 4px; 
+            font-weight: 600; 
+            text-align: center; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+        }
+        .time-pad.available { 
+            background: var(--green-bg); 
+            border-color: var(--green); 
+            color: var(--green); 
+            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.05);
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .activity-container { 
+            background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid var(--border); 
+            border-radius: 16px; 
+            height: 160px; 
+            overflow-y: auto; 
+            padding: 16px; 
+            font-size: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+        .activity-row { display: flex; gap: 10px; font-weight: 500; line-height: 1.4; color: var(--text-dark); }
+        .activity-time { color: var(--text-muted); font-weight: 400; flex-shrink: 0; }
         .activity-row.success { color: var(--green); }
         .activity-row.error { color: var(--red); }
-        .toggle-container { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+        
+        .toggle-container { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+        .toggle-container input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        #liveTag { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; transition: all 0.3s ease; }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:20px;">🚀</span>
-            <span style="font-weight:700; font-size:16px;">Radar Super-Bypass Direct v4</span>
-            <span id="liveTag" style="font-size:11px; background:var(--border); color:var(--text-muted); padding:3px 8px; border-radius:20px;">Standby</span>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <span class="brand-title">Atelier Radar v5</span>
+            <span id="liveTag" style="background:var(--border); color:var(--text-muted);">Standby</span>
         </div>
-        <button class="btn btn-main" id="actionBtn" onclick="toggleSystem()">▶ Avvia Monitoraggio</button>
+        <button class="btn btn-main" id="actionBtn" onclick="toggleSystem()">Avvia Radar</button>
     </header>
 
     <main>
         <div class="card">
-            <div class="card-title">1. Configurazione Endpoint / API</div>
+            <div class="card-title">Configurazione Sorgente</div>
             <div class="form-grid">
                 <div class="input-wrapper">
-                    <label>Link Completo dell'API da monitorare (URL)</label>
-                    <input type="text" id="apiTargetUrl" placeholder="Incolla qui l'URL rintracciato con F12">
+                    <label>Link Endpoint Concierge (API URL)</label>
+                    <input type="text" id="apiTargetUrl" placeholder="Incolla l'indirizzo catturato con F12">
                 </div>
                 
                 <div class="input-row">
                     <div class="input-wrapper">
-                        <label>Frequenza Controllo (Secondi)</label>
+                        <label>Intervallo (Secondi)</label>
                         <input type="number" id="loopSeconds" value="10" min="5">
                     </div>
                     <div class="input-wrapper">
-                        <label>Canale Notifiche Smartphone (ntfy.sh)</label>
-                        <input type="text" id="ntfyChannel" placeholder="Es: mio_canale_radar_push">
+                        <label>Canale Notifiche Privato (ntfy.sh)</label>
+                        <input type="text" id="ntfyChannel" placeholder="Es: salotto_tavoli_premium">
                     </div>
                 </div>
 
                 <div class="toggle-container">
                     <input type="checkbox" id="useGoogleBypass" checked>
-                    <label for="useGoogleBypass">Usa Tunnel Google Script (Massima stabilità anti-blocco)</label>
+                    <label for="useGoogleBypass">Attiva Instradamento Invisibile Anti-Blocco (Consigliato)</label>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">2. Risultati Scansione Live</div>
+            <div class="card-title">Disponibilità in Tempo Reale</div>
             <div class="matrix-grid" id="matrixGrid">
-                <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:20px;">
-                    Inserisci l'URL dell'API in alto e clicca su "Avvia Monitoraggio".
+                <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:30px; font-weight:400; font-style: italic;">
+                    In attesa di inizializzazione della sorgente...
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <div class="card-title" style="margin-bottom:0;">Registro Attività di Rete</div>
-                <div id="lastCheckTime" style="font-size:12px; color:var(--text-muted);">Ultimo check: mai</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div class="card-title" style="margin-bottom:0;">Registro di Rete</div>
+                <div id="lastCheckTime" style="font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted);">Update: mai</div>
             </div>
             <div class="activity-container" id="activityBox"></div>
         </div>
@@ -112,18 +259,18 @@
             const secondi = parseInt(document.getElementById("loopSeconds").value) || 10;
 
             if(!targetUrl && !isRunning) {
-                alert("Inserisci un link valido!");
+                alert("Per favore, inserisci un endpoint valido.");
                 return;
             }
 
             if(isRunning) {
                 isRunning = false;
                 clearInterval(engineInterval);
-                btn.textContent = "▶ Avvia Monitoraggio";
+                btn.textContent = "Avvia Radar";
                 btn.className = "btn btn-main";
                 tag.textContent = "Standby";
                 tag.style.background = "var(--border)"; tag.style.color = "var(--text-muted)";
-                pushLog("Engine arrestato.");
+                pushLog("Monitoraggio interrotto.");
             } else {
                 isRunning = true;
                 historyNotified.clear();
@@ -132,12 +279,12 @@
                 localStorage.setItem('saved_ntfy_channel', document.getElementById("ntfyChannel").value.trim());
                 localStorage.setItem('saved_loop_seconds', secondi);
 
-                btn.textContent = "⏹ Ferma Engine";
+                btn.textContent = "Ferma Radar";
                 btn.className = "btn btn-main running";
-                tag.textContent = "LIVE ACTIVE";
-                tag.style.background = "var(--green-glow)"; tag.style.color = "var(--green)";
+                tag.textContent = "Live Active";
+                tag.style.background = "var(--gold-light)"; tag.style.color = "var(--gold-dark)";
                 
-                pushLog("Engine v4 Diretto Avviato. Connessione sicura...");
+                pushLog("Inizializzazione sessione di monitoraggio...");
                 executeUniversalCheck();
                 engineInterval = setInterval(executeUniversalCheck, secondi * 1000);
             }
@@ -150,9 +297,8 @@
             const grid = document.getElementById("matrixGrid");
             const timeField = document.getElementById("lastCheckTime");
 
-            timeField.textContent = `Ultimo check: ${new Date().toLocaleTimeString("it-IT")}`;
+            timeField.textContent = `Update: ${new Date().toLocaleTimeString("it-IT")}`;
 
-            // Se il bypass Google è attivo, usiamo un feed asincrono che clona la richiesta bypassando il CORS nativamente
             let finalUrl = targetUrl;
             if(useGoogle) {
                 finalUrl = "https://images" + ~~(Math.random() * 3 + 1) + "-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=5&url=" + encodeURIComponent(targetUrl);
@@ -162,15 +308,13 @@
                 let response = await fetch(finalUrl);
                 let textData = await response.text();
                 
-                // Pulizia dati per estrarre la stringa JSON pulita
                 let cleanJson;
                 try {
                     cleanJson = JSON.parse(textData);
                 } catch(e) {
-                    // Se Google ci restituisce il testo incapsulato, puliamo i tag
                     let match = textData.match(/\{[\s\S]*\}/);
                     if(match) cleanJson = JSON.parse(match[0]);
-                    else throw new Error("Risposta non decifrabile");
+                    else throw new Error();
                 }
                 
                 grid.innerHTML = "";
@@ -180,14 +324,14 @@
                     if (!obj || typeof obj !== 'object') return;
 
                     if (obj.time && (obj.available === true || obj.free === true || obj.status === 'available')) {
-                        slotsFound.push({ time: obj.time, label: 'LIBERO' });
+                        slotsFound.push({ time: obj.time, label: 'DISPONIBILE' });
                         return;
                     }
 
                     for (let key in obj) {
                         if (typeof obj[key] === 'string' && (obj[key].toLowerCase() === 'available' || obj[key].toLowerCase() === 'free')) {
                             if(key.includes(":") || !isNaN(key)) {
-                                slotsFound.push({ time: key, label: 'LIBERO' });
+                                slotsFound.push({ time: key, label: 'DISPONIBILE' });
                             }
                         } else if (typeof obj[key] === 'object') {
                             searchJsonDeep(obj[key]);
@@ -202,26 +346,22 @@
                     slotsFound.forEach(slot => {
                         const pad = document.createElement("div");
                         pad.className = "time-pad available";
-                        pad.innerHTML = `<span>${slot.time}</span><span style="font-size:10px; font-weight:700;">${slot.label}</span>`;
+                        pad.innerHTML = `<span style="font-size:15px; letter-spacing:0.02em;">${slot.time}</span><span style="font-size:9px; font-weight:700; letter-spacing:0.05em;">${slot.label}</span>`;
                         grid.appendChild(pad);
 
                         if(ntfy && !historyNotified.has(slot.time)) {
                             historyNotified.add(slot.time);
-                            sendPush(ntfy, `Slot Libero! Orario: ${slot.time}.`);
+                            sendPush(ntfy, `Tavolo Disponibile Rilevato! Orario: ${slot.time}.`);
                         }
                     });
-                    pushLog(`Connessione riuscita con successo! Rilevati ${slotsFound.length} slot!`, "success");
+                    pushLog(`Scansione eseguita. Rilevati ${slotsFound.length} slot liberi.`, "success");
                 } else {
-                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:20px; font-weight:600;">❌ Tutto esaurito su questa risorsa per la data indicata.</div>`;
-                    pushLog(`Dati scaricati correttamente. Stato attuale: Tutto Esaurito.`);
+                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--red); padding:30px; font-weight:500; font-size:13px; letter-spacing:0.02em;">Nessun tavolo disponibile per i parametri indicati.</div>`;
+                    pushLog(`Controllo completato. Stato: Esaurito.`);
                 }
 
             } catch (error) {
-                pushLog("Tentativo di connessione diretta fallito. Cambio strategia...", "error");
-                // Fallback istantaneo senza proxy se Google fallisce
-                if(useGoogle) {
-                    document.getElementById("useGoogleBypass").checked = false;
-                }
+                pushLog("Connessione instabile o endpoint non raggiungibile. Nuovo tentativo...", "error");
             }
         }
 
