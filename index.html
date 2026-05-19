@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockTheSpot Premium Target Radar v7.3</title>
+    <title>LockTheSpot Premium Target Radar v8.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
         body { font-family: 'Share Tech Mono', monospace; }
         .neon-border {
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.2), inset 0 0 10px rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.5);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.15), inset 0 0 10px rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.4);
         }
         .neon-text { text-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
         ::-webkit-scrollbar { width: 6px; }
@@ -25,13 +25,13 @@
         <div>
             <h1 class="text-xl md:text-2xl font-bold tracking-wider text-green-500 neon-text flex items-center gap-2">
                 <span>[🛰️] LOCKTHESPOT</span>
-                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v7.3</span>
+                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v8.0</span>
             </h1>
-            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Premium Target Availability Scanner</p>
+            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Universal Analytics & Deep Time Target Scanner</p>
         </div>
         <div id="radarBadge" class="hidden items-center gap-2 px-3 py-1 bg-green-950/30 border border-green-500/30 rounded text-xs text-green-400">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
-            <span class="tracking-widest uppercase">SCANNING MODE ACTIVE</span>
+            <span id="badgeText" class="tracking-widest uppercase">SCANNING MODE ACTIVE</span>
         </div>
     </header>
 
@@ -42,15 +42,15 @@
                 <div class="text-center mb-6">
                     <div class="inline-block p-3 bg-green-950/50 rounded-full border border-green-900 text-green-400 text-2xl mb-2">🔐</div>
                     <h2 class="text-lg uppercase tracking-wider text-green-400">Sblocca Cassaforte</h2>
-                    <p class="text-xs text-gray-500 mt-1">Imposta o inserisci una password per crittografare i tuoi dati in locale.</p>
+                    <p class="text-xs text-gray-500 mt-1">Imposta una password temporanea o personale per cifrare i dati di sessione.</p>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs uppercase tracking-wider text-green-600 mb-1">Password Personale</label>
-                        <input type="password" id="masterPassword" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-green-400 px-4 py-3 rounded outline-none transition-colors text-sm" placeholder="Scegli o metti la tua password...">
+                        <input type="password" id="masterPassword" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-green-400 px-4 py-3 rounded outline-none transition-colors text-sm" placeholder="Inserisci una chiave di sblocco...">
                     </div>
                     <button onclick="unlockVault()" class="w-full bg-green-900/20 hover:bg-green-500 hover:text-black border border-green-500 text-green-400 font-bold uppercase tracking-widest py-3 rounded text-sm transition-all duration-200">
-                        Accedi alla Dashboard
+                        Accedi al Terminale
                     </button>
                 </div>
             </div>
@@ -61,64 +61,82 @@
             <section class="lg:col-span-5 flex flex-col gap-6">
                 <div class="bg-[#090f1e] border border-gray-900 rounded-xl p-5 shadow-2xl">
                     <h2 class="text-sm uppercase tracking-widest text-green-500 mb-4 pb-2 border-b border-gray-800/60 flex items-center justify-between">
-                        <span>Configurazione Target</span>
-                        <span class="text-xs text-gray-600">AES-GCM CRUNCH</span>
+                        <span>Configurazione Parametri</span>
+                        <span class="text-xs text-gray-600">DEEP SEARCH ENGINE</span>
                     </h2>
                     <div class="space-y-4 text-xs">
                         <div>
                             <label class="block uppercase tracking-wider text-gray-400 mb-1">Target API Endpoint URL</label>
-                            <input type="text" id="targetUrl" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="Incolla l'URL dell'API del ristorante (pulito)...">
+                            <input type="text" id="targetUrl" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="Incolla l'URL dell'API trovato tramite scheda Network...">
                         </div>
+                        
+                        <div>
+                            <label class="block uppercase tracking-wider text-green-500 mb-1 font-bold">Raggio d'Azione Temporale</label>
+                            <select id="scanMode" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-green-400 px-3 py-2.5 rounded outline-none transition-colors font-bold cursor-pointer">
+                                <option value="single">📅 Giorno Singolo Specifico</option>
+                                <option value="week">🗓️ Vista Settimanale (7 Giorni consecutivi)</option>
+                                <option value="month">📊 Vista Mensile (30 Giorni consecutivi)</option>
+                                <option value="year">🚀 Prospettiva Annuale (12 Mesi - Campionamento a Salti)</option>
+                            </select>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Data Target</label>
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Data Partenza/Target</label>
                                 <input type="date" id="targetDate" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors">
                             </div>
                             <div>
-                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Covers (Persone)</label>
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Coperti / Richiesti</label>
                                 <input type="number" id="targetCovers" min="1" value="2" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors">
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Frequenza (Secondi)</label>
-                                <input type="number" id="targetFreq" min="2" value="10" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors">
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Intervallo Loop (Secondi)</label>
+                                <input type="number" id="targetFreq" min="3" value="15" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors">
                             </div>
                             <div>
-                                <label class="block uppercase tracking-wider text-gray-400 mb-1">ntfy Channel</label>
-                                <input type="text" id="ntfyChannel" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="es: mio_radar_notifiche">
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">ntfy Push Channel</label>
+                                <input type="text" id="ntfyChannel" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="es: radar_notifiche_push">
                             </div>
                         </div>
                         <div class="pt-2 flex gap-3">
                             <button id="btnToggle" onclick="toggleRadar()" class="flex-1 bg-green-950/40 border border-green-600 hover:bg-green-500 hover:text-black text-green-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200">
                                 Avvia Scanner
                             </button>
-                            <button onclick="logoutVault()" class="bg-red-950/20 border border-red-900 text-red-400 hover:bg-red-900/40 px-3 rounded transition-all duration-200" title="Cancella sessione ed esci">
-                                🔒 Reset App
+                            <button onclick="logoutVault()" class="bg-red-950/20 border border-red-900 text-red-400 hover:bg-red-900/40 px-3 rounded transition-all duration-200" title="Resetta tutto">
+                                🔒 Reset
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div id="alertBox" class="hidden bg-green-950/20 border-2 border-green-500 rounded-xl p-4 animate-pulse">
+                <div id="alertBox" class="hidden bg-green-950/30 border-2 border-green-500 rounded-xl p-4">
                     <div class="flex items-start gap-3">
                         <span class="text-xl">🎉</span>
-                        <div>
-                            <h3 class="text-green-400 font-bold uppercase tracking-wider text-sm">Posto Trovato!</h3>
-                            <p class="text-xs text-gray-300 mt-1" id="alertDetails"></p>
-                            <div class="mt-2 flex flex-wrap gap-2" id="slotContainer"></div>
+                        <div class="w-full">
+                            <h3 class="text-green-400 font-bold uppercase tracking-wider text-sm">Disponibilità Rilevate</h3>
+                            <div class="mt-3 space-y-3 max-h-[300px] overflow-y-auto" id="resultsWrapper"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="lg:col-span-7 flex flex-col min-h-[400px] lg:min-h-0">
+            <section class="lg:col-span-7 flex flex-col gap-6 min-h-[500px]">
                 <div class="bg-[#090f1e] border border-gray-900 rounded-xl p-5 flex flex-col flex-grow shadow-2xl">
                     <h2 class="text-sm uppercase tracking-widest text-green-500 mb-3 pb-2 border-b border-gray-800/60 flex items-center justify-between">
-                        <span>Console Log di Sistema</span>
+                        <span>Console Monitor di Sistema & Biglietteria</span>
                         <button onclick="clearLogs()" class="text-[10px] text-gray-500 hover:text-gray-300 uppercase tracking-wider">[Pulisci]</button>
                     </h2>
-                    <div id="terminalLog" class="flex-grow bg-[#030712] border border-gray-950 rounded p-4 font-mono text-xs overflow-y-auto space-y-1.5 min-h-[350px] max-h-[550px]"></div>
+                    
+                    <div id="ticketAnalyticsPanel" class="hidden bg-[#030712] border border-green-900/30 rounded p-3 mb-3 text-xs">
+                        <div class="text-green-500 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <span>📊 STATO VENDITA BIGLIETTI / OCCUPAZIONE TAVOLI</span>
+                        </div>
+                        <div id="analyticsContent" class="space-y-1.5 font-mono text-[11px] text-gray-400"></div>
+                    </div>
+
+                    <div id="terminalLog" class="flex-grow bg-[#030712] border border-gray-950 rounded p-4 font-mono text-xs overflow-y-auto space-y-1.5 max-h-[450px]"></div>
                 </div>
             </section>
 
@@ -126,15 +144,16 @@
     </main>
 
     <footer class="border-t border-gray-900 bg-[#040814] px-6 py-3 text-center text-[10px] text-gray-600 tracking-widest uppercase">
-        LockTheSpot Matrix Engine v7.3 • Secured Browser Infrastructure
+        LockTheSpot Core Engine v8.0 • Deep Metric Analytics Platform
     </footer>
 
     <script>
         let intervalId = null;
         let globalKey = null;
         let audioCtx = null;
+        let globalActiveSlots = {}; 
+        let ticketStats = { sold: 0, available: 0, total: 0, history: [] };
 
-        // Auto-login automatico al refresh se c'è una sessione attiva
         window.addEventListener('DOMContentLoaded', () => {
             const savedPass = localStorage.getItem("lts_saved_pass") || sessionStorage.getItem("lts_temp_pass");
             if (savedPass) {
@@ -150,14 +169,12 @@
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(1000, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(1400, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             } catch (e) {}
         }
 
@@ -166,8 +183,7 @@
             if (!terminal) return;
             const entry = document.createElement("div");
             const time = new Date().toLocaleTimeString("it-IT");
-            let color = "text-gray-400";
-            let prefix = "[•]";
+            let color = "text-gray-400"; let prefix = "[•]";
             
             if (type === "success") { color = "text-green-400 font-bold neon-text"; prefix = "[✓]"; }
             if (type === "error") { color = "text-red-400"; prefix = "[⚠️]"; }
@@ -181,10 +197,10 @@
 
         function clearLogs() {
             document.getElementById("terminalLog").innerHTML = "";
-            logEntry("Terminale resettato.");
+            logEntry("Terminale pulito.");
         }
 
-        // Funzioni Crittografiche Web Crypto API standardizzate
+        // Cifratura Crypto API
         async function getDerivedKey(password, salt) {
             const encoder = new TextEncoder();
             const baseKey = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveKey"]);
@@ -197,10 +213,7 @@
             );
         }
 
-        function bufferToHex(buffer) {
-            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
+        function bufferToHex(buffer) { return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         function hexToBuffer(hex) {
             const view = new Uint8Array(hex.length / 2);
             for (let i = 0; i < view.length; i++) { view[i] = parseInt(hex.substr(i * 2, 2), 16); }
@@ -208,8 +221,7 @@
         }
 
         async function encryptData(text, key) {
-            const encoder = new TextEncoder();
-            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encoder = new TextEncoder(); const iv = crypto.getRandomValues(new Uint8Array(12));
             const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, encoder.encode(text));
             return { ciphertext: bufferToHex(encrypted), iv: bufferToHex(iv) };
         }
@@ -221,165 +233,191 @@
             } catch (e) { return null; }
         }
 
-        // ACCESSO DIRETTO SIMPLESSE: Qualsiasi password inserita sblocca l'app
         async function unlockVault() {
             const passwordInput = document.getElementById("masterPassword").value.trim();
             if (!passwordInput) return;
-
             try {
                 let saltHex = localStorage.getItem("lts_salt");
-                let salt;
-                if (!saltHex) {
-                    salt = crypto.getRandomValues(new Uint8Array(16));
-                    localStorage.setItem("lts_salt", bufferToHex(salt));
-                } else {
-                    salt = hexToBuffer(saltHex);
-                }
+                let salt = saltHex ? hexToBuffer(saltHex) : crypto.getRandomValues(new Uint8Array(16));
+                if (!saltHex) localStorage.setItem("lts_salt", bufferToHex(salt));
 
                 globalKey = await getDerivedKey(passwordInput, salt);
-                
-                // Salvataggio persistente della chiave per evitare rilogin continui al refresh
                 localStorage.setItem("lts_saved_pass", passwordInput);
                 sessionStorage.setItem("lts_temp_pass", passwordInput);
 
-                // Carica i vecchi record se presenti
                 const storedCipher = localStorage.getItem("lts_encryptedUrl");
                 const storedIv = localStorage.getItem("lts_iv");
                 if (storedCipher && storedIv) {
                     const decryptedUrl = await decryptData(storedCipher, storedIv, globalKey);
                     if (decryptedUrl) document.getElementById("targetUrl").value = decryptedUrl;
                 }
-
                 const savedNtfy = localStorage.getItem("lts_ntfy");
                 if (savedNtfy) document.getElementById("ntfyChannel").value = savedNtfy;
 
-                // Mostra l'interfaccia utente principale
                 document.getElementById("vaultSection").classList.add("hidden");
-                const dashboard = document.getElementById("dashboardContainer");
-                dashboard.classList.remove("hidden");
-                dashboard.classList.remove("opacity-0");
-                
+                document.getElementById("dashboardContainer").classList.remove("hidden", "opacity-0");
                 document.getElementById('targetDate').value = new Date().toISOString().split('T')[0];
-                logEntry("Sessione verificata. Crittografia AES-GCM sbloccata.", "success");
-
-            } catch (e) {
-                logEntry("Problema inizializzazione crittografica: " + e.message, "error");
-            }
+                logEntry("Engine sbloccato con successo. Terminale v8.0 pronto.", "success");
+            } catch (e) { logEntry("Errore durante lo sblocco: " + e.message, "error"); }
         }
 
         function logoutVault() {
             if(intervalId) toggleRadar();
-            globalKey = null;
-            localStorage.clear();
-            sessionStorage.clear();
-            location.reload();
+            localStorage.clear(); sessionStorage.clear(); location.reload();
+        }
+
+        function addDays(dateStr, days) {
+            const result = new Date(dateStr); result.setDate(result.getDate() + days);
+            return result.toISOString().split('T')[0];
+        }
+
+        function addMonths(dateStr, months) {
+            const result = new Date(dateStr); result.setMonth(result.getMonth() + months);
+            return result.toISOString().split('T')[0];
         }
 
         async function toggleRadar() {
             const btn = document.getElementById("btnToggle");
             const badge = document.getElementById("radarBadge");
+            const badgeTxt = document.getElementById("badgeText");
             
             if (intervalId) {
-                clearInterval(intervalId);
-                intervalId = null;
+                clearInterval(intervalId); intervalId = null;
                 btn.textContent = "Avvia Scanner";
                 btn.className = "flex-1 bg-green-950/40 border border-green-600 hover:bg-green-500 hover:text-black text-green-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200";
                 badge.classList.add("hidden");
-                logEntry("Ciclo di scansione terminato.");
+                logEntry("Scansione terminata e radar in standby.");
             } else {
                 let url = document.getElementById("targetUrl").value.trim();
-                const date = document.getElementById("targetDate").value;
+                const startDate = document.getElementById("targetDate").value;
                 const covers = document.getElementById("targetCovers").value;
-                const freq = parseInt(document.getElementById("targetFreq").value) || 10;
+                const freq = parseInt(document.getElementById("targetFreq").value) || 15;
                 const ntfy = document.getElementById("ntfyChannel").value.trim();
+                const mode = document.getElementById("scanMode").value;
 
-                if (!url) { alert("Inserisci l'URL dell'API del ristorante per scansionare."); return; }
-                if (!date) { alert("Scegli la data sul calendario."); return; }
+                if (!url) { alert("Incolla un URL API valido prima!"); return; }
+                if (!startDate) { alert("Definisci una data iniziale."); return; }
 
-                // NORMALIZZAZIONE E PULIZIA AUTOMATICA DELL'URL
-                url = url.replace(/([\?&])date=[^&]*/g, '').replace(/([\?&])covers=[^&]*/g, '').replace(/([\?&])_nocache=[^&]*/g, '');
-                url = url.replace(/&\s*$/, '').replace(/\?\s*$/, '');
-                document.getElementById("targetUrl").value = url;
+                if(url.includes("date=") || url.includes("covers=") || url.includes("guest-count=")) {
+                    url = url.replace(/([\?&])date=[^&]*/g, '').replace(/([\?&])covers=[^&]*/g, '').replace(/([\?&])guest-count=[^&]*/g, '').replace(/([\?&])_nocache=[^&]*/g, '');
+                    url = url.replace(/&\s*$/, '').replace(/\?\s*$/, '');
+                    document.getElementById("targetUrl").value = url;
+                }
 
-                // Cifra e archivia localmente i dati per i prossimi utilizzi
                 try {
                     const encryptedData = await encryptData(url, globalKey);
                     localStorage.setItem("lts_encryptedUrl", encryptedData.ciphertext);
                     localStorage.setItem("lts_iv", encryptedData.iv);
                     localStorage.setItem("lts_ntfy", ntfy);
-                } catch(e) {
-                    logEntry("Errore salvataggio protetto dati.", "error");
-                    return;
-                }
+                } catch(e) { return; }
 
                 btn.textContent = "Arresta Scanner";
                 btn.className = "flex-1 bg-red-950/40 border border-red-600 hover:bg-red-500 hover:text-black text-red-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200";
                 badge.classList.remove("hidden");
+                badgeTxt.innerText = `DEEP ${mode.toUpperCase()} MODE ACTIVE`;
 
-                logEntry(`Scan initialized - Intervallo: ${freq}s.`, "info");
+                globalActiveSlots = {};
+                ticketStats = { sold: 0, available: 0, total: 0, history: [] };
+                document.getElementById("alertBox").classList.add("hidden");
+                document.getElementById("ticketAnalyticsPanel").classList.add("hidden");
+
+                logEntry(`Radar Inizializzato [Modello: ${mode.toUpperCase()}]. Scansione ricorsiva ogni ${freq}s.`, "info");
                 
-                executeScan(url, date, covers, ntfy);
-                intervalId = setInterval(() => { executeScan(url, date, covers, ntfy); }, freq * 1000);
+                runScanCycle(url, startDate, covers, ntfy, mode);
+                intervalId = setInterval(() => { runScanCycle(url, startDate, covers, ntfy, mode); }, freq * 1000);
             }
+        }
+
+        async function runScanCycle(url, startDate, covers, ntfy, mode) {
+            let iterations = 1;
+            let currentModeText = "GIORNO SINGOLO";
+            
+            if (mode === "week") { iterations = 7; currentModeText = "SETTIMANALE (7G)"; }
+            if (mode === "month") { iterations = 30; currentModeText = "MENSILE (30G)"; }
+            if (mode === "year") { iterations = 12; currentModeText = "ANNUALE (A SALTI DI MESE)"; }
+
+            logEntry(`--- INIZIO SCANSIONE RADAR: ${currentModeText} ---`, "warn");
+            
+            for (let i = 0; i < iterations; i++) {
+                let currentTargetDate;
+                if (mode === "year") {
+                    currentTargetDate = addMonths(startDate, i); // Controlla la stessa data nei 12 mesi dell'anno
+                } else {
+                    currentTargetDate = addDays(startDate, i); // Sequenziale giorno dopo giorno
+                }
+                
+                await executeScan(url, currentTargetDate, covers, ntfy);
+                await new Promise(resolve => setTimeout(resolve, 250)); // Sleep preventivo anti-rate-limit
+            }
+            
+            logEntry(`--- CICLO COMPLETATO CON SUCCESSO ---`, "success");
+            renderGlobalResults();
+            updateAnalyticsUI();
         }
 
         async function executeScan(baseApiUrl, date, covers, ntfyChannel) {
-            logEntry("Esecuzione richiesta via Cloudflare Global Edge Network Proxy...", "info");
-            
             let finalUrl = baseApiUrl;
-            finalUrl += (finalUrl.includes("?") ? "&" : "?") + `date=${date}&covers=${covers}&_nocache=${new Date().getTime()}`;
+            finalUrl += (finalUrl.includes("?") ? "&" : "?") + `date=${date}&covers=${covers}&guest-count=${covers}&_nocache=${new Date().getTime()}`;
 
-            const cloudflareProxyUrl = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(finalUrl)}`;
 
             try {
-                const response = await fetch(cloudflareProxyUrl, {
-                    method: "GET",
-                    headers: { "Accept": "application/json" }
-                });
-
-                if (response.status === 401 || response.status === 403) {
-                    logEntry(`Rifiutato dal server remoto (HTTP ${response.status}). Token o credenziali mancanti.`, "error");
-                    return;
-                }
-                if (response.status === 404) {
-                    logEntry(`HTTP Error 404: Risorsa non trovata. Controlla l'estensione dell'indirizzo API.`, "error");
-                    return;
-                }
-                if (!response.ok) {
-                    logEntry(`Incongruenza proxy di rete. Status HTTP: ${response.status}`, "warn");
-                    return;
-                }
-
+                const response = await fetch(proxyUrl, { method: "GET", headers: { "Accept": "application/json" } });
+                if (!response.ok) return;
                 const json = await response.json();
-                parseResponse(json, date, ntfyChannel);
-
-            } catch (e) {
-                logEntry("Nessuna risposta ricevuta dall'infrastruttura di rete. In attesa del prossimo loop.", "error");
-            }
+                parseResponseData(json, date, ntfyChannel);
+            } catch (e) {}
         }
 
-        function parseResponse(data, date, ntfyChannel) {
+        // ENGINE DI INTRECCIO E PARSING DATI BIGLIETTERIA/POSTI + ANALYTICS
+        function parseResponseData(data, date, ntfyChannel) {
             let found = false;
-            let capturedSlots = [];
+            let detectedSlots = [];
 
             function traverse(obj) {
                 if (!obj || typeof obj !== 'object') return;
-                if (obj.hasOwnProperty('time') && (obj.available === true || obj.free === true || obj.status === 'available' || obj.status === 'free')) {
-                    found = true;
-                    capturedSlots.push(obj.time);
+
+                // Estrazione dati vendita biglietti / Capienza (se esposti nell'API dell'evento)
+                let tSold = obj.sold_tickets || obj.tickets_sold || obj.purchased_count || obj.sold || null;
+                let tAvail = obj.available_tickets || obj.tickets_available || obj.remaining || obj.free_count || null;
+                let tTotal = obj.total_tickets || obj.capacity || obj.total_seats || null;
+
+                if (tSold !== null || tAvail !== null) {
+                    let sold = parseInt(tSold) || 0;
+                    let avail = parseInt(tAvail) || 0;
+                    let total = parseInt(tTotal) || (sold + avail);
+                    
+                    if (avail > 0) {
+                        found = true;
+                        detectedSlots.push(`Disponibili: ${avail} Tix`);
+                    }
+                    
+                    // Archivia le metriche storiche aggregate per l'analizzatore grafico
+                    let existingIndex = ticketStats.history.findIndex(h => h.date === date);
+                    let statItem = { date: date, sold: sold, avail: avail, total: total };
+                    if (existingIndex > -1) ticketStats.history[existingIndex] = statItem;
+                    else ticketStats.history.push(statItem);
                 }
-                if (obj.hasOwnProperty('availability') && (obj.availability === true || String(obj.availability).toLowerCase() === 'true')) found = true;
-                if (obj.hasOwnProperty('available') && (obj.available === true || String(obj.available).toLowerCase() === 'true')) found = true;
+
+                // Strutture classiche Ristoranti / Slot Orari
+                if (obj.hasOwnProperty('time') && (obj.available === true || obj.free === true || obj.status === 'available' || obj.status === 'free' || obj.selectable === true)) {
+                    found = true; if(obj.time) detectedSlots.push(obj.time);
+                }
+
+                // Parsing array di orari comuni
                 for (let key in obj) {
                     if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
-                        if (key === 'slots' || key === 'times') {
+                        if (['slots', 'times', 'timeSlots', 'availableSlots', 'listings'].includes(key)) {
                             if (Array.isArray(obj[key])) {
                                 obj[key].forEach(item => {
-                                    if (typeof item === 'string') { found = true; capturedSlots.push(item); }
-                                    else if (item && typeof item === 'object' && item.time) { found = true; capturedSlots.push(item.time); }
-                                    else { found = true; }
+                                    found = true;
+                                    if (typeof item === 'string') detectedSlots.push(item);
+                                    else if (item && typeof item === 'object') {
+                                        let details = item.time || item.hour || (item.available_tickets ? `${item.available_tickets} tix` : null);
+                                        if (details) detectedSlots.push(details);
+                                    }
                                 });
-                            } else if (typeof obj[key] === 'object') { found = true; }
+                            }
                         }
                         traverse(obj[key]);
                     }
@@ -389,42 +427,95 @@
             traverse(data);
 
             if (found) {
-                logEntry(`Disponibilità Intercettata per il giorno ${date}!`, "success");
-                playBeep();
+                let cleanSlots = [...new Set(detectedSlots)].sort();
+                if (cleanSlots.length === 0) cleanSlots = ["Disponibile"];
                 
-                const alertBox = document.getElementById("alertBox");
-                const details = document.getElementById("alertDetails");
-                const container = document.getElementById("slotContainer");
-                
-                container.innerHTML = "";
-                alertBox.classList.remove("hidden");
-                details.innerText = `Presenza di slot aperti rilevata in data ${date}:`;
-                
-                if (capturedSlots.length > 0) {
-                    const uniqueSlots = [...new Set(capturedSlots)].sort();
-                    uniqueSlots.forEach(slot => {
-                        const s = document.createElement("span");
-                        s.className = "bg-green-500 text-black px-2 py-0.5 rounded text-[11px] font-bold";
-                        s.innerText = slot;
-                        container.appendChild(s);
-                    });
+                if (!globalActiveSlots[date]) {
+                    logEntry(`TARGET INTERCETTATO -> Data: [${date}] Orari/Ticket: [${cleanSlots.join(" | ")}]`, "success");
+                    playBeep();
+                    if (ntfyChannel) sendNtfyNotification(ntfyChannel, date, cleanSlots);
                 }
-                if (ntfyChannel) sendNtfyNotification(ntfyChannel, date, capturedSlots);
+                globalActiveSlots[date] = cleanSlots;
             } else {
-                logEntry(`Verifica completata per il ${date}: Nessun tavolo libero rilevato.`, "info");
-                document.getElementById("alertBox").classList.add("hidden");
+                delete globalActiveSlots[date];
             }
         }
 
-        async function sendNtfyNotification(channel, date, slots) {
-            let message = `Tavolo disponibile trovato per il giorno ${date}!`;
-            if (slots.length > 0) message += ` Orari: ${[...new Set(slots)].join(" - ")}`;
-            try {
-                await fetch(`https://ntfy.sh/${channel}`, { method: 'POST', body: message });
-                logEntry(`Notifica inviata con successo su ntfy.sh/${channel}`, "info");
-            } catch (err) {
-                logEntry("Impossibile recapitare il push tramite ntfy gateway.", "error");
+        // AGGIORNA LA DASHBOARD VISIVA DEI POSTI LIBERI
+        function renderGlobalResults() {
+            const alertBox = document.getElementById("alertBox");
+            const wrapper = document.getElementById("resultsWrapper");
+            const activeDates = Object.keys(globalActiveSlots).sort();
+
+            if (activeDates.length === 0) {
+                alertBox.classList.add("hidden"); return;
             }
+
+            wrapper.innerHTML = ""; alertBox.classList.remove("hidden");
+
+            activeDates.forEach(date => {
+                const block = document.createElement("div");
+                block.className = "border-b border-green-900/20 pb-2 last:border-0";
+                const formattedDate = new Date(date).toLocaleDateString("it-IT", { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                
+                let badges = "";
+                globalActiveSlots[date].forEach(slot => {
+                    badges += `<span class="bg-green-500 text-black px-2 py-0.5 rounded text-[11px] font-bold border border-green-400/30">${slot}</span>`;
+                });
+
+                block.innerHTML = `
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs font-bold text-green-400">🎯 ${formattedDate} (${date})</span>
+                        <div class="flex flex-wrap gap-1.5">${badges}</div>
+                    </div>
+                `;
+                wrapper.appendChild(block);
+            });
+        }
+
+        // CREA IL DIAGRAMMA E LA TABELLA DEI BIGLIETTI COMPRATI/RIMASTI
+        function updateAnalyticsUI() {
+            const panel = document.getElementById("ticketAnalyticsPanel");
+            const content = document.getElementById("analyticsContent");
+            
+            if (ticketStats.history.length === 0) {
+                panel.classList.add("hidden"); return;
+            }
+
+            panel.classList.remove("hidden");
+            content.innerHTML = "";
+
+            ticketStats.history.sort((a,b) => a.date.localeCompare(b.date)).forEach(stat => {
+                let percentSold = stat.total > 0 ? Math.round((stat.sold / stat.total) * 100) : 0;
+                
+                // Genera una barra di caricamento testuale (Es: [██████░░░░] 60%)
+                let barLength = 15;
+                let filledLength = Math.round((percentSold / 100) * barLength);
+                let barStr = "█".repeat(filledLength) + "░".repeat(barLength - filledLength);
+                
+                let colorClass = "text-gray-400";
+                if (stat.avail > 0) colorClass = "text-green-400 font-bold";
+
+                const row = document.createElement("div");
+                row.className = `flex flex-col md:flex-row md:items-center justify-between gap-1 border-b border-gray-900 pb-1.5 ${colorClass}`;
+                row.innerHTML = `
+                    <span>📅 ${stat.date} -> Venduti: ${stat.sold}/${stat.total} tix</span>
+                    <span class="font-mono text-xs text-gray-500 flex items-center gap-2">
+                        <span>[${barStr}] ${percentSold}% COMPRATO</span>
+                        <span class="text-green-400 font-bold">(${stat.avail} rimasti)</span>
+                    </span>
+                `;
+                content.appendChild(row);
+            });
+        }
+
+        async function sendNtfyNotification(channel, date, slots) {
+            try {
+                await fetch(`https://ntfy.sh/${channel}`, { 
+                    method: 'POST', 
+                    body: `🛰️ Radar Rilevamento: Posto trovato per il ${date}! Dettagli: ${slots.join(" | ")}` 
+                });
+            } catch (err) {}
         }
     </script>
 </body>
