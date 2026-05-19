@@ -2,341 +2,505 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LockTheSpot - Premium Radar v7.0</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxDxNmOn1+4FR6G4U6lOWcTyFuL1FjWnxa0lCDvaVVfOCCMkv9dfv8aG65M7Y7gM69iBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LockTheSpot Premium Target Radar v7.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-marble: #f8f9fa; --surface: rgba(255, 255, 255, 0.9); --surface-card: #ffffff;
-            --border: #e9ecef; --gold: #c5a059; --gold-dark: #92733f; --gold-light: rgba(197, 160, 89, 0.15);
-            --text-main: #212529; --text-muted: #6c757d; --green: #15803d; --red: #b91c1c;
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        body {
+            font-family: 'Share Tech Mono', monospace;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-font-smoothing: antialiased; }
-        
-        body { 
-            background: var(--bg-marble);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(197, 160, 89, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(197, 160, 89, 0.05) 0px, transparent 50%),
-                linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            background-attachment: fixed;
-            color: var(--text-main); padding-bottom: 50px; 
+        .neon-border {
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.2), inset 0 0 10px rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
         }
-        
-        header { 
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(197, 160, 89, 0.25); padding: 0 24px; height: 85px; 
-            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
+        .neon-text {
+            text-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
         }
-
-        .brand-container { display: flex; flex-direction: column; }
-        .brand-logo { font-family: 'Cinzel', serif; font-weight: 800; font-size: 20px; letter-spacing: 0.08em; color: var(--gold-dark); text-transform: uppercase; }
-        .brand-sub { font-size: 9px; font-weight: 700; letter-spacing: 0.35em; color: var(--text-muted); text-transform: uppercase; margin-top: -2px; }
-        
-        .btn { 
-            background: #ffffff; color: var(--gold-dark); border: 1.5px solid var(--gold); padding: 12px 28px; 
-            border-radius: 40px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--gold-light); }
-        .btn-main { background: var(--gold-dark); color: #ffffff; border: none; }
-        .btn-main.running { background: var(--red); box-shadow: 0 5px 20px rgba(185, 28, 28, 0.25); }
-        
-        main { max-width: 900px; margin: 0 auto; padding: 25px 18px; display: flex; flex-direction: column; gap: 25px; }
-        
-        .card { 
-            background: var(--surface); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 28px; padding: 30px; 
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        ::-webkit-scrollbar-track {
+            background: #090d16;
         }
-        
-        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; }
-        .card-title { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--gold-dark); letter-spacing: 0.1em; text-transform: uppercase; }
-        .card-line { flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--gold-light), transparent); }
-        
-        .input-group { display: flex; flex-direction: column; gap: 20px; }
-        .input-field { display: flex; flex-direction: column; gap: 8px; }
-        .input-field label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; padding-left: 5px; }
-        .input-field input { 
-            background: rgba(255,255,255,0.8); border: 1px solid var(--border); border-radius: 18px; padding: 15px 20px;
-            font-size: 13px; font-weight: 500; color: var(--text-main); transition: all 0.3s ease; 
+        ::-webkit-scrollbar-thumb {
+            background: #166534;
+            border-radius: 3px;
         }
-        .input-field input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px var(--gold-light); }
-        
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        @media (max-width: 650px) { .grid-3 { grid-template-columns: 1fr; } }
-
-        .matrix-display { display: flex; flex-direction: column; gap: 15px; }
-        .date-row { background: rgba(255,255,255,0.5); border-radius: 20px; padding: 15px; border: 1px dashed var(--border); }
-        .date-label { font-size: 11px; font-weight: 700; color: var(--gold-dark); margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .slots-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
-        
-        .slot-pill { 
-            background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 12px 5px;
-            display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.3s ease;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22c55e;
         }
-        .slot-pill.active { 
-            background: rgba(21, 128, 61, 0.06); border-color: var(--green); color: var(--green); 
-            box-shadow: 0 5px 15px rgba(21, 128, 61, 0.1); animation: slotPop 0.5s ease-out;
-        }
-        @keyframes slotPop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
-
-        .activity-log { 
-            background: rgba(255,255,255,0.4); border-radius: 20px; height: 180px; overflow-y: auto; 
-            padding: 20px; border: 1px solid var(--border); font-size: 11px; display: flex; flex-direction: column; gap: 8px;
-        }
-        .log-entry { display: flex; gap: 10px; line-height: 1.4; border-bottom: 1px solid rgba(0,0,0,0.02); padding-bottom: 4px; }
-        .log-time { color: var(--text-muted); font-family: monospace; font-weight: 600; }
-        .log-msg.success { color: var(--green); font-weight: 600; }
-        .log-msg.error { color: var(--red); }
-
-        .scan-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; color: var(--gold-dark); background: var(--gold-light); padding: 5px 12px; border-radius: 20px; }
-        .dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 1s infinite alternate; }
-        @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
     </style>
 </head>
-<body>
+<body class="bg-[#030712] text-gray-300 min-h-screen flex flex-col justify-between selection:bg-green-500 selection:text-black">
 
-    <header>
-        <div class="brand-container">
-            <span class="brand-logo">LockTheSpot</span>
-            <span class="brand-sub">Premium Target Radar v7.0</span>
+    <header class="border-b border-green-900/40 bg-[#0b1329]/60 backdrop-blur px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-xl md:text-2xl font-bold tracking-wider text-green-500 neon-text flex items-center gap-2">
+                <span>[🛰️] LOCKTHESPOT</span>
+                <span class="text-xs bg-green-950 text-green-400 border border-green-800 px-2 py-0.5 rounded animate-pulse">RADAR v7.0</span>
+            </h1>
+            <p class="text-xs text-gray-500 tracking-widest uppercase mt-0.5">Premium Target Availability Scanner</p>
         </div>
-        <div id="statusBadge" class="scan-indicator" style="display:none;">
-            <div class="dot"></div> <span id="scanningDate">Analisi...</span>
+        <div id="radarBadge" class="hidden items-center gap-2 px-3 py-1 bg-green-950/30 border border-green-500/30 rounded text-xs text-green-400">
+            <span class="w-2 height-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+            <span class="tracking-widest uppercase">SCANNING MODE ACTIVE</span>
         </div>
-        <button class="btn btn-main" id="actionBtn" onclick="toggleEliteSystem()">Inizia Scansione</button>
     </header>
 
-    <main>
-        <div class="card" style="border: 1px solid rgba(197, 160, 89, 0.4); background: rgba(255, 255, 255, 0.95);">
-            <div class="card-header"><span class="card-title">🛡️ Sicurezza Vault AES</span><div class="card-line"></div></div>
-            <div class="input-field">
-                <label>Chiave di Cifratura Privata (Password segreta per sbloccare i tuoi dati)</label>
-                <input type="password" id="vaultKey" placeholder="Immetti la tua password per sbloccare o salvare..." oninput="handleKeyChange()">
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header"><span class="card-title">Parametri di Scansione</span><div class="card-line"></div></div>
-            <div class="input-group">
-                <div class="input-field">
-                    <label>Endpoint API Ristorante (Catturato con F12)</label>
-                    <input type="text" id="baseUrl" placeholder="Incolla qui il link dell'API del locale...">
+    <main class="flex-grow p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <section id="vaultSection" class="lg:col-span-12 max-w-md mx-auto w-full my-auto transition-all duration-300">
+            <div class="bg-[#090f1e] neon-border rounded-xl p-6 md:p-8">
+                <div class="text-center mb-6">
+                    <div class="inline-block p-3 bg-green-950/50 rounded-full border border-green-900 text-green-400 text-2xl mb-2">🔐</div>
+                    <h2 class="text-lg uppercase tracking-wider text-green-400">Secure Vault Access</h2>
+                    <p class="text-xs text-gray-500 mt-1">Derivazione chiave PBKDF2 e cifratura simmetrica AES-GCM locale</p>
                 </div>
-                
-                <div class="grid-3">
-                    <div class="input-field">
-                        <label>Seleziona Giorno da Monitorare</label>
-                        <input type="date" id="targetCalendar">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-green-600 mb-1">Master Password</label>
+                        <input type="password" id="masterPassword" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-green-400 px-4 py-3 rounded outline-none transition-colors text-sm" placeholder="••••••••••••••••">
                     </div>
-                    <div class="input-field">
-                        <label>Covers (Persone)</label>
-                        <input type="number" id="covers" value="2">
-                    </div>
-                    <div class="input-field">
-                        <label>Frequenza Check (Sec)</label>
-                        <input type="number" id="freq" value="10" min="5">
-                    </div>
-                </div>
-
-                <div class="input-field">
-                    <label>Canale Notifiche Push (ntfy.sh)</label>
-                    <input type="text" id="ntfy" placeholder="Es: salotto_tavoli_radar">
+                    <button onclick="unlockVault()" class="w-full bg-green-900/20 hover:bg-green-500 hover:text-black border border-green-500 text-green-400 font-bold uppercase tracking-widest py-3 rounded text-sm transition-all duration-200">
+                        Sblocca Vault
+                    </button>
+                    <div id="vaultError" class="text-xs text-red-400 text-center uppercase tracking-wider hidden"></div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="card">
-            <div class="card-header"><span class="card-title">Matrix Disponibilità Live</span><div class="card-line"></div></div>
-            <div id="liveMatrix" class="matrix-display">
-                <div style="text-align:center; color:var(--text-muted); font-style:italic; padding:40px; font-size:13px;">
-                    Imposta la password del Vault, inserisci l'URL e avvia il motore...
+        <div id="dashboardContainer" class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6 hidden opacity-0 transition-opacity duration-500">
+            
+            <section class="lg:col-span-5 flex flex-col gap-6">
+                <div class="bg-[#090f1e] border border-gray-900 rounded-xl p-5 shadow-2xl">
+                    <h2 class="text-sm uppercase tracking-widest text-green-500 mb-4 pb-2 border-b border-gray-800/60 flex items-center justify-between">
+                        <span>Configurazione Target</span>
+                        <span class="text-xs text-gray-600">AES-GCM SECURE</span>
+                    </h2>
+                    <div class="space-y-4 text-xs">
+                        <div>
+                            <label class="block uppercase tracking-wider text-gray-400 mb-1">Target API Endpoint URL</label>
+                            <input type="text" id="targetUrl" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="https://secure.plateform.app/api/v1/business/...">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Data Target</label>
+                                <input type="date" id="targetDate" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Covers (Persone)</label>
+                                <input type="number" id="targetCovers" min="1" value="2" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">Frequenza (Secondi)</label>
+                                <input type="number" id="targetFreq" min="2" value="10" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block uppercase tracking-wider text-gray-400 mb-1">ntfy Channel</label>
+                                <input type="text" id="ntfyChannel" class="w-full bg-[#030712] border border-gray-800 focus:border-green-500 text-gray-300 px-3 py-2.5 rounded outline-none transition-colors" placeholder="es: radar_spots_premium">
+                            </div>
+                        </div>
+                        <div class="pt-2 flex gap-3">
+                            <button id="btnToggle" onclick="toggleRadar()" class="flex-1 bg-green-950/40 border border-green-600 hover:bg-green-500 hover:text-black text-green-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200">
+                                Avvia Scanner
+                            </button>
+                            <button onclick="lockVault()" class="bg-red-950/20 border border-red-900 text-red-400 hover:bg-red-900/40 px-3 rounded transition-all duration-200" title="Blocca Cassaforte">
+                                🔒 Lock
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="card">
-            <div class="card-header"><span class="card-title">Registro Log di Sistema</span><div class="card-line"></div></div>
-            <div id="activityLog" class="activity-log"></div>
+                <div id="alertBox" class="hidden bg-green-950/20 border-2 border-green-500 rounded-xl p-4 animate-pulse">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl">🎉</span>
+                        <div>
+                            <h3 class="text-green-400 font-bold uppercase tracking-wider text-sm">Disponibilità Intercettata!</h3>
+                            <p class="text-xs text-gray-300 mt-1" id="alertDetails">Slot liberi rilevati all'interno della risposta JSON del server.</p>
+                            <div class="mt-2 flex gap-2" id="slotContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lg:col-span-7 flex flex-col min-h-[400px] lg:min-h-0">
+                <div class="bg-[#090f1e] border border-gray-900 rounded-xl p-5 flex flex-col flex-grow shadow-2xl">
+                    <h2 class="text-sm uppercase tracking-widest text-green-500 mb-3 pb-2 border-b border-gray-800/60 flex items-center justify-between">
+                        <span>Console Log di Sistema</span>
+                        <button onclick="clearLogs()" class="text-[10px] text-gray-500 hover:text-gray-300 uppercase tracking-wider">[Pulisci]</button>
+                    </h2>
+                    <div id="terminalLog" class="flex-grow bg-[#030712] border border-gray-950 rounded p-4 font-mono text-xs overflow-y-auto space-y-1.5 min-h-[300px] max-h-[500px]"></div>
+                </div>
+            </section>
+
         </div>
     </main>
 
+    <footer class="border-t border-gray-900 bg-[#040814] px-6 py-3 text-center text-[10px] text-gray-600 tracking-widest uppercase">
+        LockTheSpot Matrix Engine v7.0 • Secured Browser Infrastructure
+    </footer>
+
     <script>
-        let isRunning = false;
-        let rotationTimer = null;
-        let notifiedSlots = new Set();
+        let intervalId = null;
+        let globalKey = null;
+        let audioCtx = null;
 
-        window.onload = () => {
-            const oggi = new Date().toISOString().split('T')[0];
-            document.getElementById('targetCalendar').value = oggi;
-            pushLog("Vault Inizializzato. Digita la tua chiave segreta per sbloccare i link.");
-        };
-
-        // Decrittografa al volo i dati salvati non appena la password inserita è corretta
-        function handleKeyChange() {
-            const key = document.getElementById("vaultKey").value;
-            if(!key) return;
-
+        function playBeep() {
             try {
-                const encryptedUrl = localStorage.getItem('enc_url');
-                const encryptedNtfy = localStorage.getItem('enc_ntfy');
-
-                if (encryptedUrl) {
-                    const decUrl = CryptoJS.AES.decrypt(encryptedUrl, key).toString(CryptoJS.enc.Utf8);
-                    if(decUrl.startsWith("http")) document.getElementById('baseUrl').value = decUrl;
-                }
-                if (encryptedNtfy) {
-                    const decNtfy = CryptoJS.AES.decrypt(encryptedNtfy, key).toString(CryptoJS.enc.Utf8);
-                    if(decNtfy) document.getElementById('ntfy').value = decNtfy;
-                }
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15);
+                
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
             } catch (e) {
-                // Silenzioso se la password non è ancora completa o corretta
+                logEntry("Impossibile riprodurre alert audio: " + e.message, "error");
             }
         }
 
-        function toggleEliteSystem() {
-            const btn = document.getElementById("actionBtn");
-            const badge = document.getElementById("statusBadge");
-            const url = document.getElementById("baseUrl").value.trim();
-            const selectedDate = document.getElementById("targetCalendar").value;
-            const key = document.getElementById("vaultKey").value;
-
-            if(!key) {
-                alert("Protezione Obligatoria: Inserisci una password nel Vault AES per difendere i tuoi dati.");
-                return;
-            }
-            if(!url || !selectedDate) {
-                alert("Parametri mancanti: Assicurati di inserire l'URL e scegliere un giorno sul calendario.");
-                return;
-            }
-
-            if(isRunning) {
-                isRunning = false;
-                clearInterval(rotationTimer);
-                btn.textContent = "Inizia Scansione";
-                btn.className = "btn btn-main";
-                badge.style.display = "none";
-                pushLog("Monitoraggio LockTheSpot arrestato.");
-            } else {
-                isRunning = true;
-                notifiedSlots.clear();
-                
-                // Cifratura simmetrica dei parametri sensibili prima del salvataggio nel browser
-                const encUrl = CryptoJS.AES.encrypt(url, key).toString();
-                const encNtfy = CryptoJS.AES.encrypt(document.getElementById("ntfy").value.trim(), key).toString();
-                
-                localStorage.setItem('enc_url', encUrl);
-                localStorage.setItem('enc_ntfy', encNtfy);
-
-                btn.textContent = "Spegni Radar";
-                btn.className = "btn btn-main running";
-                badge.style.display = "inline-flex";
-                
-                pushLog(`[Crypto Lock] Configurazione cifrata nel database locale. Analisi avviata sul giorno: ${selectedDate}`);
-                runScannerCycle();
-                rotationTimer = setInterval(runScannerCycle, parseInt(document.getElementById("freq").value) * 1000);
-            }
-        }
-
-        async function runScannerCycle() {
-            const base = document.getElementById("baseUrl").value.trim();
-            const targetDate = document.getElementById("targetCalendar").value;
-            const ntfy = document.getElementById("ntfy").value.trim();
-            const covers = document.getElementById("covers").value;
-            
-            document.getElementById("scanningDate").textContent = `Analisi: ${targetDate}`;
-
-            let proxyUrl = base;
-            proxyUrl = proxyUrl.replace(/date=\d{4}-\d{2}-\d{2}/, `date=${targetDate}`);
-            proxyUrl = proxyUrl.replace(/covers=\d+/, `covers=${covers}`);
-
-            if(proxyUrl.includes('?')) {
-                proxyUrl += `&_nocache=${new Date().getTime()}`;
-            } else {
-                proxyUrl += `?_nocache=${new Date().getTime()}`;
-            }
-
-            // Routing ultra-veloce tramite la rete globale Cloudflare di corsproxy.io
-            const cloudflarePoweredUrl = `https://corsproxy.io/?${encodeURIComponent(proxyUrl)}`;
-
-            try {
-                const response = await fetch(cloudflarePoweredUrl);
-                if (!response.ok) throw new Error();
-                const json = await response.json();
-                
-                let foundSlots = [];
-                
-                function extractSlots(obj) {
-                    if (!obj || typeof obj !== 'object') return;
-                    if (obj.time && (obj.available === true || obj.free === true || obj.status === 'available')) {
-                        foundSlots.push(obj.time);
-                    }
-                    for (let k in obj) if (typeof obj[k] === 'object') extractSlots(obj[k]);
-                }
-                extractSlots(json);
-
-                renderLiveView(targetDate, foundSlots);
-
-                if(foundSlots.length > 0) {
-                    pushLog(`[Cloudflare Node] Rilevati ${foundSlots.length} slot liberi per il giorno ${targetDate}!`, "success");
-                    foundSlots.forEach(time => {
-                        let id = `${targetDate}_${time}`;
-                        if(ntfy && !notifiedSlots.has(id)) {
-                            notifiedSlots.add(id);
-                            fetch(`https://ntfy.sh/${ntfy}`, { method: 'POST', body: `Tavolo LIBERO! Giorno: ${targetDate} ore ${time}` });
-                        }
-                    });
-                } else {
-                    pushLog(`[Cloudflare Node] Analisi eseguita per il ${targetDate}: Sold Out.`);
-                }
-
-            } catch (e) {
-                pushLog("Nessuna risposta dal server di sblocco Cloudflare. Ripeto al prossimo intervallo.", "error");
-            }
-        }
-
-        function renderLiveView(date, slots) {
-            const matrixElem = document.getElementById("liveMatrix");
-            matrixElem.innerHTML = "";
-            
-            const row = document.createElement("div");
-            row.className = "date-row";
-            
-            const label = document.createElement("div");
-            label.className = "date-label";
-            label.innerHTML = `<span>📅 Esito per il: ${date}</span> <span>${slots.length > 0 ? slots.length + ' disponibili' : 'Sold Out'}</span>`;
-            row.appendChild(label);
-
-            const container = document.createElement("div");
-            container.className = "slots-container";
-            
-            if(slots.length > 0) {
-                slots.sort().forEach(time => {
-                    const pill = document.createElement("div");
-                    pill.className = "slot-pill active";
-                    pill.innerHTML = `<span style="font-size:13px; font-weight:600;">${time}</span><span style="font-size:8px;font-weight:800;">LIBERO</span>`;
-                    container.appendChild(pill);
-                });
-            } else {
-                container.innerHTML = `<div style="font-size:11px; color:var(--red); font-weight:600; text-transform:uppercase; padding:10px 5px;">❌ Nessun tavolo disponibile in questa data</div>`;
-            }
-            
-            row.appendChild(container);
-            matrixElem.appendChild(row);
-        }
-
-        function pushLog(msg, type = "") {
-            const log = document.getElementById("activityLog");
+        function logEntry(msg, type = "info") {
+            const terminal = document.getElementById("terminalLog");
             const entry = document.createElement("div");
-            entry.className = "log-entry";
             const time = new Date().toLocaleTimeString("it-IT");
-            entry.innerHTML = `<span class="log-time">[${time}]</span><span class="log-msg ${type}">${msg}</span>`;
-            log.insertBefore(entry, log.firstChild);
+            
+            let color = "text-gray-400";
+            let prefix = "[•]";
+            
+            if (type === "success") { color = "text-green-400 font-bold neon-text"; prefix = "[✓]"; }
+            if (type === "error") { color = "text-red-400"; prefix = "[⚠️]"; }
+            if (type === "warn") { color = "text-yellow-500"; prefix = "[!]"; }
+            
+            entry.className = `${color} leading-relaxed break-all`;
+            entry.innerHTML = `<span class="text-gray-600">[${time}]</span> ${prefix} ${msg}`;
+            terminal.appendChild(entry);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById("terminalLog").innerHTML = "";
+            logEntry("Terminale resettato.");
+        }
+
+        async function getDerivedKey(password, salt) {
+            const encoder = new TextEncoder();
+            const baseKey = await crypto.subtle.importKey(
+                "raw",
+                encoder.encode(password),
+                "PBKDF2",
+                false,
+                ["deriveKey"]
+            );
+            return crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: salt,
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                baseKey,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        function bufferToHex(buffer) {
+            return Array.from(new Uint8Array(buffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        function hexToBuffer(hex) {
+            const view = new Uint8Array(hex.length / 2);
+            for (let i = 0; i < view.length; i++) {
+                view[i] = parseInt(hex.substr(i * 2, 2), 16);
+            }
+            return view.buffer;
+        }
+
+        async function encryptData(text, key) {
+            const encoder = new TextEncoder();
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                encoder.encode(text)
+            );
+            return {
+                ciphertext: bufferToHex(encrypted),
+                iv: bufferToHex(iv)
+            };
+        }
+
+        async function decryptData(ciphertextHex, ivHex, key) {
+            try {
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: hexToBuffer(ivHex) },
+                    key,
+                    hexToBuffer(ciphertextHex)
+                );
+                return new TextDecoder().decode(decrypted);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function unlockVault() {
+            const passwordInput = document.getElementById("masterPassword").value;
+            const errorElement = document.getElementById("vaultError");
+            errorElement.classList.add("hidden");
+
+            if (!passwordInput) {
+                errorElement.innerText = "Inserisci una password.";
+                errorElement.classList.remove("hidden");
+                return;
+            }
+
+            try {
+                let saltHex = localStorage.getItem("lts_salt");
+                let salt;
+                
+                if (!saltHex) {
+                    salt = crypto.getRandomValues(new Uint8Array(16));
+                    localStorage.setItem("lts_salt", bufferToHex(salt));
+                } else {
+                    salt = hexToBuffer(saltHex);
+                }
+
+                globalKey = await getDerivedKey(passwordInput, salt);
+                
+                const storedCipher = localStorage.getItem("lts_encryptedUrl");
+                const storedIv = localStorage.getItem("lts_iv");
+                
+                if (storedCipher && storedIv) {
+                    const decryptedUrl = await decryptData(storedCipher, storedIv, globalKey);
+                    if (decryptedUrl === null) {
+                        errorElement.innerText = "Master password non valida.";
+                        errorElement.classList.remove("hidden");
+                        globalKey = null;
+                        return;
+                    }
+                    document.getElementById("targetUrl").value = decryptedUrl;
+                }
+
+                const savedNtfy = localStorage.getItem("lts_ntfy");
+                if (savedNtfy) document.getElementById("ntfyChannel").value = savedNtfy;
+
+                document.getElementById("vaultSection").classList.add("hidden");
+                const dashboard = document.getElementById("dashboardContainer");
+                dashboard.classList.remove("hidden");
+                setTimeout(() => dashboard.classList.remove("opacity-0"), 50);
+                
+                const oggi = new Date().toISOString().split('T')[0];
+                document.getElementById('targetDate').value = oggi;
+                
+                logEntry("Vault sbloccato con successo via hardware crypto API.", "info");
+
+            } catch (e) {
+                errorElement.innerText = "Errore inizializzazione: " + e.message;
+                errorElement.classList.remove("hidden");
+            }
+        }
+
+        function lockVault() {
+            if(intervalId) toggleRadar();
+            globalKey = null;
+            document.getElementById("masterPassword").value = "";
+            document.getElementById("targetUrl").value = "";
+            
+            const dashboard = document.getElementById("dashboardContainer");
+            dashboard.classList.add("opacity-0");
+            setTimeout(() => {
+                dashboard.classList.add("hidden");
+                document.getElementById("vaultSection").classList.remove("hidden");
+            }, 500);
+        }
+
+        async function toggleRadar() {
+            const btn = document.getElementById("btnToggle");
+            const badge = document.getElementById("radarBadge");
+            
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+                btn.textContent = "Avvia Scanner";
+                btn.className = "flex-1 bg-green-950/40 border border-green-600 hover:bg-green-500 hover:text-black text-green-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200";
+                badge.classList.add("hidden");
+                logEntry("Engine di scansione arrestato dal supervisore.");
+            } else {
+                const url = document.getElementById("targetUrl").value.trim();
+                const date = document.getElementById("targetDate").value;
+                const covers = document.getElementById("targetCovers").value;
+                const freq = parseInt(document.getElementById("targetFreq").value) || 10;
+                const ntfy = document.getElementById("ntfyChannel").value.trim();
+
+                if (!url) { logEntry("Parametro mancante: Target API URL richiesto.", "error"); return; }
+                if (!date) { logEntry("Parametro mancante: Data di monitoraggio richiesta.", "error"); return; }
+
+                try {
+                    const encryptedData = await encryptData(url, globalKey);
+                    localStorage.setItem("lts_encryptedUrl", encryptedData.ciphertext);
+                    localStorage.setItem("lts_iv", encryptedData.iv);
+                    if(ntfy) localStorage.setItem("lts_ntfy", ntfy);
+                } catch(e) {
+                    logEntry("Errore salvataggio protetto parametri: " + e.message, "error");
+                    return;
+                }
+
+                btn.textContent = "Arresta Scanner";
+                btn.className = "flex-1 bg-red-950/40 border border-red-600 hover:bg-red-500 hover:text-black text-red-400 font-bold uppercase tracking-widest py-3 rounded transition-all duration-200";
+                badge.classList.remove("hidden");
+
+                logEntry(`Scan started - Frequenza impostata: ogni ${freq} secondi.`, "info");
+                
+                executeScan(url, date, covers, ntfy);
+                intervalId = setInterval(() => {
+                    executeScan(url, date, covers, ntfy);
+                }, freq * 1000);
+            }
+        }
+
+        async function executeScan(baseApiUrl, date, covers, ntfyChannel) {
+            logEntry("Checking target endpoint status...", "info");
+            
+            let finalUrl = baseApiUrl;
+            try {
+                if (finalUrl.includes("date=")) {
+                    finalUrl = finalUrl.replace(/date=\d{4}-\d{2}-\d{2}/, `date=${date}`);
+                } else {
+                    finalUrl += (finalUrl.includes("?") ? "&" : "?") + `date=${date}`;
+                }
+                if (finalUrl.includes("covers=")) {
+                    finalUrl = finalUrl.replace(/covers=\d+/, `covers=${covers}`);
+                } else {
+                    finalUrl += `&covers=${covers}`;
+                }
+            } catch(err) {
+                logEntry("Errore formattazione dinamica parametri URL.", "error");
+            }
+
+            try {
+                const response = await fetch(finalUrl, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    logEntry(`Accesso negato dal server remoto (HTTP ${response.status}). Autenticazione fallita o scaduta.`, "error");
+                    return;
+                }
+
+                if (!response.ok) {
+                    logEntry(`HTTP Error rilevato dall'endpoint: Status ${response.status}`, "warn");
+                    return;
+                }
+
+                const json = await response.json();
+                parseResponse(json, date, ntfyChannel);
+
+            } catch (e) {
+                logEntry("Fetch fallito o violazione CORS network layer. Controllo in coda.", "error");
+            }
+        }
+
+        function parseResponse(data, date, ntfyChannel) {
+            let found = false;
+            let capturedSlots = [];
+
+            function traverse(obj) {
+                if (!obj || typeof obj !== 'object') return;
+
+                if (obj.hasOwnProperty('time') && 
+                    (obj.available === true || obj.free === true || obj.status === 'available' || obj.status === 'free')) {
+                    found = true;
+                    capturedSlots.push(obj.time);
+                }
+
+                if (obj.hasOwnProperty('availability') && (obj.availability === true || String(obj.availability).toLowerCase() === 'true')) found = true;
+                if (obj.hasOwnProperty('available') && (obj.available === true || String(obj.available).toLowerCase() === 'true')) found = true;
+
+                for (let key in obj) {
+                    if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
+                        if (key === 'slots' || key === 'times') {
+                            if (Array.isArray(obj[key])) {
+                                obj[key].forEach(item => {
+                                    if (typeof item === 'string') { found = true; capturedSlots.push(item); }
+                                    else if (item && typeof item === 'object' && item.time) { found = true; capturedSlots.push(item.time); }
+                                    else { found = true; }
+                                });
+                            } else if (typeof obj[key] === 'object') {
+                                found = true;
+                            }
+                        }
+                        traverse(obj[key]);
+                    }
+                }
+            }
+
+            traverse(data);
+
+            if (found) {
+                logEntry(`Availability found! Rilevati parametri di risorsa libera per il ${date}.`, "success");
+                playBeep();
+                
+                const alertBox = document.getElementById("alertBox");
+                const details = document.getElementById("alertDetails");
+                const container = document.getElementById("slotContainer");
+                
+                container.innerHTML = "";
+                alertBox.classList.remove("hidden");
+                details.innerText = `Intercettata disponibilità attiva per il giorno ${date}.`;
+                
+                if (capturedSlots.length > 0) {
+                    const uniqueSlots = [...new Set(capturedSlots)].sort();
+                    uniqueSlots.forEach(slot => {
+                        const s = document.createElement("span");
+                        s.className = "bg-green-500 text-black px-2 py-0.5 rounded text-[11px] font-bold";
+                        s.innerText = slot;
+                        container.appendChild(s);
+                    });
+                }
+
+                if (ntfyChannel) {
+                    sendNtfyNotification(ntfyChannel, date, capturedSlots);
+                }
+            } else {
+                logEntry(`Verifica completata per il ${date}: Risorsa attualmente esaurita.`, "info");
+                document.getElementById("alertBox").classList.add("hidden");
+            }
+        }
+
+        async function sendNtfyNotification(channel, date, slots) {
+            let message = `Tavolo disponibile trovato per il giorno ${date}!`;
+            if (slots.length > 0) message += ` Orari: ${[...new Set(slots)].join(" - ")}`;
+            
+            try {
+                await fetch(`https://ntfy.sh/${channel}`, {
+                    method: 'POST',
+                    body: message
+                });
+                logEntry(`Notifica push inoltrata sul canale ntfy: ${channel}`, "info");
+            } catch (err) {
+                logEntry("Impossibile contattare il gateway di notifica ntfy.sh", "error");
+            }
         }
     </script>
 </body>
